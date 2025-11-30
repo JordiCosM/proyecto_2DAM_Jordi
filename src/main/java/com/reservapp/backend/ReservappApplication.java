@@ -1,4 +1,4 @@
-package com.reservapp.reservapp;
+package com.reservapp.backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
