@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public class ServicioDTO {
     private Integer id;
-    private Integer idEmpresa;
+    private Long idEmpresa;
     private String nombre;
     private String descripcion;
     private Integer duracion;
@@ -18,11 +18,11 @@ public class ServicioDTO {
         this.id = id;
     }
 
-    public Integer getIdEmpresa() {
+    public Long getIdEmpresa() {
         return idEmpresa;
     }
 
-    public void setIdEmpresa(Integer idEmpresa) {
+    public void setIdEmpresa(Long idEmpresa) {
         this.idEmpresa = idEmpresa;
     }
 

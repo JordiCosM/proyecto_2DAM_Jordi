@@ -4,6 +4,7 @@ import com.reservapp.backend.dto.ServicioDTO;
 import com.reservapp.backend.exception.ResourceNotFoundException;
 import com.reservapp.backend.mapper.ServicioMapper;
 import com.reservapp.backend.model.Servicio;
+import com.reservapp.backend.repository.EmpresaRepository;
 import com.reservapp.backend.repository.ServicioRepository;
 import com.reservapp.backend.service.ServicioService;
 import org.springframework.stereotype.Service;
@@ -15,15 +16,20 @@ import java.util.stream.Collectors;
 public class ServicioServiceImpl implements ServicioService {
     private final ServicioRepository servicioRepository;
     private final ServicioMapper servicioMapper;
+    private final EmpresaRepository empresaRepository;
 
-    public ServicioServiceImpl(ServicioRepository servicioRepository, ServicioMapper servicioMapper) {
+    public ServicioServiceImpl(ServicioRepository servicioRepository, ServicioMapper servicioMapper,  EmpresaRepository empresaRepository) {
         this.servicioRepository = servicioRepository;
         this.servicioMapper = servicioMapper;
+        this.empresaRepository = empresaRepository;
     }
 
     @Override
     public ServicioDTO crearServicio(ServicioDTO dto) {
         Servicio servicio = servicioMapper.toEntity(dto);
+
+        servicio.setEmpresa(empresaRepository.findById(dto.getIdEmpresa()).orElseThrow(() -> new ResourceNotFoundException("Empresa no encontrada")));
+
         Servicio guardado = servicioRepository.save(servicio);
         return servicioMapper.toDTO(guardado);
     }
@@ -36,6 +42,10 @@ public class ServicioServiceImpl implements ServicioService {
         servicio.setDescripcion(dto.getDescripcion());
         servicio.setDuracion(dto.getDuracion());
         servicio.setPrecio(dto.getPrecio());
+
+        if (dto.getIdEmpresa() != null) {
+            servicio.setEmpresa(empresaRepository.findById(dto.getIdEmpresa()).orElseThrow(() -> new ResourceNotFoundException("Empresa no encontrada")));
+        }
 
         return servicioMapper.toDTO(servicioRepository.save(servicio));
     }

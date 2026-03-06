@@ -2,8 +2,8 @@ package com.reservapp.backend.dto;
 
 public class EmpresaDTO {
     private Integer id;
-    private Integer idUsuario;
-    private Integer idCiudad;
+    private Long idUsuario;
+    private Long idCiudad;
     private String nombre;
     private String descripcion;
     private String direccion;
@@ -20,19 +20,19 @@ public class EmpresaDTO {
         this.id = id;
     }
 
-    public Integer getIdUsuario() {
+    public Long getIdUsuario() {
         return idUsuario;
     }
 
-    public void setIdUsuario(Integer idUsuario) {
+    public void setIdUsuario(Long idUsuario) {
         this.idUsuario = idUsuario;
     }
 
-    public Integer getIdCiudad() {
+    public Long getIdCiudad() {
         return idCiudad;
     }
 
-    public void setIdCiudad(Integer idCiudad) {
+    public void setIdCiudad(Long idCiudad) {
         this.idCiudad = idCiudad;
     }
 

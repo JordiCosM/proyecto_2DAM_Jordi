@@ -2,6 +2,8 @@ package com.reservapp.backend.controller;
 
 import com.reservapp.backend.dto.ProvinciaDTO;
 import com.reservapp.backend.service.ProvinciaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/provincias")
+@Tag(name = "Provincias", description = "API de las provincias")
 public class ProvinciaController {
     private final ProvinciaService provinciaService;
 
@@ -20,11 +23,13 @@ public class ProvinciaController {
     }
 
     @GetMapping
+    @Operation(summary = "Listar todas las provincias", description = "Listar todas las provincias")
     public ResponseEntity<List<ProvinciaDTO>> getAll() {
         return ResponseEntity.ok(provinciaService.listarProvincias());
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Recoger una provincia", description = "Recoger una provincia por su id")
     public ResponseEntity<ProvinciaDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(provinciaService.obtenerProvinciaPorId(id));
     }
