@@ -1,29 +1,28 @@
 package com.reservapp.backend.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "empresas")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Empresa {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_ciudad", nullable = false)
     private Ciudad ciudad;
 
@@ -49,8 +48,8 @@ public class Empresa {
     private String logoUrl;
 
     @OneToMany(mappedBy = "empresa")
-    private List<Servicio> servicios;
+    private List<Servicio> servicios = new ArrayList<>();
 
     @OneToMany(mappedBy = "empresa")
-    private List<Horario> horarios;
+    private List<Horario> horarios = new ArrayList<>();
 }

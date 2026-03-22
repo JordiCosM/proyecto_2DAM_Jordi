@@ -1,25 +1,24 @@
 package com.reservapp.backend.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "ciudades")
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Ciudad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_provincia", nullable = false)
     private Provincia provincia;
 
@@ -30,5 +29,5 @@ public class Ciudad {
     private String codPostal;
 
     @OneToMany(mappedBy = "ciudad")
-    private List<Empresa> empresas;
+    private List<Empresa> empresas = new ArrayList<>();
 }

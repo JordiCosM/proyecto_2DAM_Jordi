@@ -11,9 +11,9 @@ import com.reservapp.backend.repository.EmpresaRepository;
 import com.reservapp.backend.repository.UsuarioRepository;
 import com.reservapp.backend.service.EmpresaService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class EmpresaServiceImpl implements EmpresaService {
@@ -30,22 +30,26 @@ public class EmpresaServiceImpl implements EmpresaService {
     }
 
     @Override
+    @Transactional
     public EmpresaDTO crearEmpresa(EmpresaDTO dto) {
         Empresa empresa = empresaMapper.toEntity(dto);
 
-        Usuario usuario = usuarioRepository.findById(dto.getIdUsuario()).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
         empresa.setUsuario(usuario);
 
-        Ciudad ciudad = ciudadRepository.findById(dto.getIdCiudad()).orElseThrow(() -> new ResourceNotFoundException("Ciudad no encontrada"));
+        Ciudad ciudad = ciudadRepository.findById(dto.getIdCiudad())
+                .orElseThrow(() -> new ResourceNotFoundException("Ciudad no encontrada"));
         empresa.setCiudad(ciudad);
 
-        Empresa guardado = empresaRepository.save(empresa);
-        return empresaMapper.toDTO(guardado);
+        return empresaMapper.toDTO(empresaRepository.save(empresa));
     }
 
     @Override
+    @Transactional
     public EmpresaDTO actualizarEmpresa(Long id, EmpresaDTO dto) {
-        Empresa empresa = empresaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Empresa no encontrada"));
+        Empresa empresa = empresaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Empresa no encontrada"));
 
         empresa.setNombre(dto.getNombre());
         empresa.setDescripcion(dto.getDescripcion());
@@ -56,12 +60,14 @@ public class EmpresaServiceImpl implements EmpresaService {
         empresa.setLogoUrl(dto.getLogoUrl());
 
         if (dto.getIdUsuario() != null) {
-            Usuario usuario = usuarioRepository.findById(dto.getIdUsuario()).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+            Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
+                    .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
             empresa.setUsuario(usuario);
         }
 
         if (dto.getIdCiudad() != null) {
-            Ciudad ciudad = ciudadRepository.findById(dto.getIdCiudad()).orElseThrow(() -> new ResourceNotFoundException("Ciudad no encontrada"));
+            Ciudad ciudad = ciudadRepository.findById(dto.getIdCiudad())
+                    .orElseThrow(() -> new ResourceNotFoundException("Ciudad no encontrada"));
             empresa.setCiudad(ciudad);
         }
 
@@ -70,21 +76,32 @@ public class EmpresaServiceImpl implements EmpresaService {
 
     @Override
     public EmpresaDTO obtenerEmpresaPorId(Long id) {
-        Empresa empresa = empresaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Empresa no encontrada"));
+        Empresa empresa = empresaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Empresa no encontrada"));
         return empresaMapper.toDTO(empresa);
     }
 
     @Override
     public List<EmpresaDTO> listarEmpresas() {
-        return empresaRepository.findAll().stream().map(empresaMapper::toDTO).collect(Collectors.toList());
+        return empresaRepository.findAll().stream().map(empresaMapper::toDTO).toList();
     }
 
     @Override
+    public List<EmpresaDTO> listarEmpresasPorUsuario(Long idUsuario) {
+        return empresaRepository.findByUsuarioId(idUsuario).stream().map(empresaMapper::toDTO).toList();
+    }
+
+    @Override
+    public List<EmpresaDTO> listarEmpresasPorCiudad(Long idCiudad) {
+        return empresaRepository.findByCiudadId(idCiudad).stream().map(empresaMapper::toDTO).toList();
+    }
+
+    @Override
+    @Transactional
     public void eliminarEmpresa(Long id) {
         if (!empresaRepository.existsById(id)) {
             throw new ResourceNotFoundException("Empresa no encontrada");
         }
-
         empresaRepository.deleteById(id);
     }
 }

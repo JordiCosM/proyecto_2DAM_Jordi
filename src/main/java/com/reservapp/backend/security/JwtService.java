@@ -1,43 +1,63 @@
 package com.reservapp.backend.security;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
 import java.util.Date;
 
 @Service
 public class JwtService {
-    @Value("Y4S4K0mJk8Bx9k83LxyzAEa8Ldl2Tmf7c7qjATjQoJ4=")
+
+    @Value("${jwt.secret}")
     private String jwtSecret;
 
     @Value("${jwt.expiration}")
     private long expiration;
 
+    private SecretKey getKey() {
+        byte[] bytes = Decoders.BASE64.decode(jwtSecret);
+        return Keys.hmacShaKeyFor(bytes);
+    }
+
     public String generateToken(String email) {
         return Jwts.builder()
-                .setSubject(email)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(SignatureAlgorithm.HS256, jwtSecret)
+                .subject(email)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getKey())
                 .compact();
     }
 
     public String extractEmail(String token) {
         return Jwts.parser()
-                .setSigningKey(jwtSecret)
+                .verifyWith(getKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
     }
 
-    public boolean validateToken(String token) {
+    public boolean validateToken(String token, UserDetails user) {
         try {
-            Jwts.parser().setSigningKey(jwtSecret).build().parseSignedClaims(token);
-            return true;
-        } catch (JwtException ex) {
+            String email = extractEmail(token);
+            return email.equals(user.getUsername()) && !isTokenExpired(token);
+        } catch (JwtException e) {
             return false;
         }
+    }
+
+    private boolean isTokenExpired(String token) {
+        Date expDate = Jwts.parser()
+                .verifyWith(getKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getExpiration();
+        return expDate.before(new Date());
     }
 }

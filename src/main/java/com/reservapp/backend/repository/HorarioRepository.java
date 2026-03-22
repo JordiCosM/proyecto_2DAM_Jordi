@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface HorarioRepository extends JpaRepository<Horario, Long> {
     List<Horario> findByEmpresaId(Long empresaId);
-    List<Horario> findByDia(String dia);
+    List<Horario> findByDia(Horario.Dia dia);
 }

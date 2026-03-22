@@ -9,5 +9,7 @@ public interface EmpresaService {
     EmpresaDTO actualizarEmpresa(Long id, EmpresaDTO dto);
     EmpresaDTO obtenerEmpresaPorId(Long id);
     List<EmpresaDTO> listarEmpresas();
+    List<EmpresaDTO> listarEmpresasPorUsuario(Long idUsuario);
+    List<EmpresaDTO> listarEmpresasPorCiudad(Long idCiudad);
     void eliminarEmpresa(Long id);
 }

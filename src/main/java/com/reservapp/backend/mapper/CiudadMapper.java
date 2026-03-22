@@ -10,5 +10,7 @@ public interface CiudadMapper {
     @Mapping(source = "provincia.id", target = "idProvincia")
     CiudadDTO toDTO(Ciudad ciudad);
 
+    @Mapping(target = "provincia", ignore = true)
+    @Mapping(target = "empresas", ignore = true)
     Ciudad toEntity(CiudadDTO dto);
 }
