@@ -1,10 +1,7 @@
 package com.reservapp.backend.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalTime;
 
@@ -12,19 +9,20 @@ import java.time.LocalTime;
 @Table(name = "horarios")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Horario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_empresa", nullable = false)
     private Empresa empresa;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "ENUM('L','M','X','J','V','S','D')")
+    @Column(nullable = false, length = 10)
     private Dia dia;
 
     @Column(nullable = false)
@@ -34,6 +32,6 @@ public class Horario {
     private LocalTime cierre;
 
     public enum Dia {
-        L, M, X, J, V, S, D
+        LUNES, MARTES, MIERCOLES, JUEVES, VIERNES, SABADO, DOMINGO
     }
 }

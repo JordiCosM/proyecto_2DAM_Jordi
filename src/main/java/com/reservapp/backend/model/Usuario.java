@@ -1,10 +1,7 @@
 package com.reservapp.backend.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -12,12 +9,13 @@ import java.util.List;
 @Table(name = "usuarios")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(nullable = false, length = 100)
     private String nombre;
@@ -35,8 +33,9 @@ public class Usuario {
     private String telefono;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "ENUM('cliente','empresa','admin') default 'cliente'")
-    private Rol rol;
+    @Column(nullable = false, length = 20)
+    @Builder.Default
+    private Rol rol = Rol.CLIENTE;
 
     @OneToMany(mappedBy = "usuario")
     private List<Empresa> empresas;
@@ -45,6 +44,6 @@ public class Usuario {
     private List<Reserva> reservas;
 
     public enum Rol {
-        cliente, empresa, admin
+        CLIENTE, EMPRESA, ADMIN
     }
 }

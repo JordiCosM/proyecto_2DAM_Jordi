@@ -4,7 +4,10 @@ import com.reservapp.backend.dto.ServicioDTO;
 import com.reservapp.backend.service.ServicioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,37 +23,40 @@ public class ServicioController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar todos los servicios", description = "Listar todos los servicios")
+    @Operation(summary = "Listar todos los servicios")
     public ResponseEntity<List<ServicioDTO>> getAll() {
         return ResponseEntity.ok(servicioService.listarServicios());
     }
 
-    @GetMapping("/empresa/{idEmpresa}")
-    @Operation(summary = "Listar todos los servicios de una empresa", description = "Listar todos los servicios de una empresa por su id")
-    public ResponseEntity<List<ServicioDTO>> getByEmpresa(@PathVariable Long idEmpresa) {
-        return ResponseEntity.ok(servicioService.listarServiciosPorEmpresa(idEmpresa));
-    }
-
     @GetMapping("/{id}")
-    @Operation(summary = "Recoger un servicio", description = "Recoger un servicio por su id")
+    @Operation(summary = "Obtener un servicio por id")
     public ResponseEntity<ServicioDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(servicioService.obtenerServicioPorId(id));
     }
 
+    @GetMapping("/empresa/{idEmpresa}")
+    @Operation(summary = "Listar servicios de una empresa")
+    public ResponseEntity<List<ServicioDTO>> getByEmpresa(@PathVariable Long idEmpresa) {
+        return ResponseEntity.ok(servicioService.listarServiciosPorEmpresa(idEmpresa));
+    }
+
     @PostMapping
-    @Operation(summary = "Crear un servicio", description = "Crear un servicio")
-    public ResponseEntity<ServicioDTO> create(@RequestBody ServicioDTO dto) {
-        return ResponseEntity.ok(servicioService.crearServicio(dto));
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @Operation(summary = "Crear un servicio")
+    public ResponseEntity<ServicioDTO> create(@Valid @RequestBody ServicioDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(servicioService.crearServicio(dto));
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Actualizar un servicio", description = "Actualizar un servicio por su id")
-    public ResponseEntity<ServicioDTO> update(@PathVariable Long id, @RequestBody ServicioDTO dto) {
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @Operation(summary = "Actualizar un servicio")
+    public ResponseEntity<ServicioDTO> update(@PathVariable Long id, @Valid @RequestBody ServicioDTO dto) {
         return ResponseEntity.ok(servicioService.actualizarServicio(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Eliminar un servicio", description = "Eliminar un servicio por su id")
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @Operation(summary = "Eliminar un servicio")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         servicioService.eliminarServicio(id);
         return ResponseEntity.noContent().build();

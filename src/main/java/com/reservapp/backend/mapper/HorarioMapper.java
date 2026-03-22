@@ -9,5 +9,7 @@ import org.mapstruct.Mapping;
 public interface HorarioMapper {
     @Mapping(source = "empresa.id", target = "idEmpresa")
     HorarioDTO toDTO(Horario horario);
+
+    @Mapping(target = "empresa", ignore = true)
     Horario toEntity(HorarioDTO dto);
 }

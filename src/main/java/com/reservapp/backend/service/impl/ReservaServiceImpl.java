@@ -11,9 +11,10 @@ import com.reservapp.backend.repository.ServicioRepository;
 import com.reservapp.backend.repository.UsuarioRepository;
 import com.reservapp.backend.service.ReservaService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ReservaServiceImpl implements ReservaService {
@@ -22,7 +23,8 @@ public class ReservaServiceImpl implements ReservaService {
     private final UsuarioRepository usuarioRepository;
     private final ServicioRepository servicioRepository;
 
-    public ReservaServiceImpl(ReservaRepository reservaRepository, ReservaMapper reservaMapper, UsuarioRepository usuarioRepository, ServicioRepository servicioRepository) {
+    public ReservaServiceImpl(ReservaRepository reservaRepository, ReservaMapper reservaMapper,
+                              UsuarioRepository usuarioRepository, ServicioRepository servicioRepository) {
         this.reservaRepository = reservaRepository;
         this.reservaMapper = reservaMapper;
         this.usuarioRepository = usuarioRepository;
@@ -30,73 +32,87 @@ public class ReservaServiceImpl implements ReservaService {
     }
 
     @Override
+    @Transactional
     public ReservaDTO crearReserva(ReservaDTO dto) {
-//        Reserva reserva = reservaMapper.toEntity(dto);
-//        Reserva guardado = reservaRepository.save(reserva);
-//        return reservaMapper.toDTO(guardado);
-
         Reserva reserva = new Reserva();
 
-        Usuario usuario = usuarioRepository.findById(Long.valueOf(dto.getIdUsuario()))
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
         reserva.setUsuario(usuario);
 
-        Servicio servicio = servicioRepository.findById(Long.valueOf(dto.getIdServicio()))
-                .orElseThrow(() -> new RuntimeException("Servicio no encontrado"));
+        Servicio servicio = servicioRepository.findById(dto.getIdServicio())
+                .orElseThrow(() -> new ResourceNotFoundException("Servicio no encontrado"));
         reserva.setServicio(servicio);
 
         reserva.setFecha(dto.getFecha());
         reserva.setHoraInicio(dto.getHoraInicio());
         reserva.setHoraFin(dto.getHoraFin());
+        reserva.setEstado(dto.getEstado() != null ? dto.getEstado() : Reserva.Estado.PENDIENTE);
 
-        if(dto.getEstado() != null) {
-            reserva.setEstado(Reserva.Estado.valueOf(dto.getEstado()));
-        } else {
-            reserva.setEstado(Reserva.Estado.pendiente);
-        }
-
-        Reserva guardado = reservaRepository.save(reserva);
-        return reservaMapper.toDTO(guardado);
+        return reservaMapper.toDTO(reservaRepository.save(reserva));
     }
 
     @Override
+    @Transactional
     public ReservaDTO actualizarReserva(Long id, ReservaDTO dto) {
-        Reserva reserva = reservaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada"));
+        Reserva reserva = reservaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada"));
 
         reserva.setFecha(dto.getFecha());
         reserva.setHoraInicio(dto.getHoraInicio());
         reserva.setHoraFin(dto.getHoraFin());
-        reserva.setEstado(Reserva.Estado.valueOf(dto.getEstado().toLowerCase()));
+        reserva.setEstado(dto.getEstado());
 
         return reservaMapper.toDTO(reservaRepository.save(reserva));
     }
 
     @Override
     public ReservaDTO obtenerReservaPorId(Long id) {
-        Reserva reserva = reservaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada"));
+        Reserva reserva = reservaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada"));
         return reservaMapper.toDTO(reserva);
     }
 
     @Override
     public List<ReservaDTO> listarReservas() {
-        return reservaRepository.findAll().stream().map(reservaMapper::toDTO).collect(Collectors.toList());
+        return reservaRepository.findAll().stream().map(reservaMapper::toDTO).toList();
     }
 
     @Override
     public List<ReservaDTO> listarReservasPorUsuario(Long idUsuario) {
-        return reservaRepository.findByUsuarioId(idUsuario).stream().map(reservaMapper::toDTO).collect(Collectors.toList());
+        return reservaRepository.findByUsuarioId(idUsuario).stream().map(reservaMapper::toDTO).toList();
     }
 
     @Override
     public List<ReservaDTO> listarReservasPorServicio(Long idServicio) {
-        return reservaRepository.findByServicioId(idServicio).stream().map(reservaMapper::toDTO).collect(Collectors.toList());
+        return reservaRepository.findByServicioId(idServicio).stream().map(reservaMapper::toDTO).toList();
     }
 
     @Override
-    public void cancelarReserva(Long id) {
-        Reserva reserva = reservaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada"));
+    public List<ReservaDTO> listarReservasPorFecha(LocalDate fecha) {
+        return reservaRepository.findByFecha(fecha).stream().map(reservaMapper::toDTO).toList();
+    }
 
-        reserva.setEstado(Reserva.Estado.cancelada);
+    @Override
+    public List<ReservaDTO> listarReservasPorServicioYFecha(Long idServicio, LocalDate fecha) {
+        return reservaRepository.findByServicioIdAndFecha(idServicio, fecha).stream().map(reservaMapper::toDTO).toList();
+    }
+
+    @Override
+    @Transactional
+    public ReservaDTO cambiarEstado(Long id, Reserva.Estado nuevoEstado) {
+        Reserva reserva = reservaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada"));
+        reserva.setEstado(nuevoEstado);
+        return reservaMapper.toDTO(reservaRepository.save(reserva));
+    }
+
+    @Override
+    @Transactional
+    public void cancelarReserva(Long id) {
+        Reserva reserva = reservaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada"));
+        reserva.setEstado(Reserva.Estado.CANCELADA);
         reservaRepository.save(reserva);
     }
 }

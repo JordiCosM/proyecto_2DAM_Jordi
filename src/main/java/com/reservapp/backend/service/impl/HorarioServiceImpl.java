@@ -7,9 +7,9 @@ import com.reservapp.backend.model.Horario;
 import com.reservapp.backend.repository.HorarioRepository;
 import com.reservapp.backend.service.HorarioService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class HorarioServiceImpl implements HorarioService {
@@ -22,17 +22,19 @@ public class HorarioServiceImpl implements HorarioService {
     }
 
     @Override
+    @Transactional
     public HorarioDTO crearHorario(HorarioDTO dto) {
         Horario horario = horarioMapper.toEntity(dto);
-        Horario guardado = horarioRepository.save(horario);
-        return horarioMapper.toDTO(guardado);
+        return horarioMapper.toDTO(horarioRepository.save(horario));
     }
 
     @Override
+    @Transactional
     public HorarioDTO actualizarHorario(Long id, HorarioDTO dto) {
-        Horario horario = horarioRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Horario no encontrado"));
+        Horario horario = horarioRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Horario no encontrado"));
 
-        horario.setDia(Horario.Dia.valueOf(dto.getDia()));
+        horario.setDia(dto.getDia());
         horario.setApertura(dto.getApertura());
         horario.setCierre(dto.getCierre());
 
@@ -41,26 +43,27 @@ public class HorarioServiceImpl implements HorarioService {
 
     @Override
     public HorarioDTO obtenerHorarioPorId(Long id) {
-        Horario horario = horarioRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Horario no encontrado"));
+        Horario horario = horarioRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Horario no encontrado"));
         return horarioMapper.toDTO(horario);
     }
 
     @Override
     public List<HorarioDTO> listarHorarios() {
-        return horarioRepository.findAll().stream().map(horarioMapper::toDTO).collect(Collectors.toList());
+        return horarioRepository.findAll().stream().map(horarioMapper::toDTO).toList();
     }
 
     @Override
     public List<HorarioDTO> listarHorariosPorEmpresa(Long idEmpresa) {
-        return horarioRepository.findByEmpresaId(idEmpresa).stream().map(horarioMapper::toDTO).collect(Collectors.toList());
+        return horarioRepository.findByEmpresaId(idEmpresa).stream().map(horarioMapper::toDTO).toList();
     }
 
     @Override
+    @Transactional
     public void eliminarHorario(Long id) {
         if (!horarioRepository.existsById(id)) {
             throw new ResourceNotFoundException("Horario no encontrado");
         }
-
         horarioRepository.deleteById(id);
     }
 }

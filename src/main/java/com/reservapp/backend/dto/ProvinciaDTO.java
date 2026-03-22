@@ -1,22 +1,9 @@
 package com.reservapp.backend.dto;
 
+import lombok.Data;
+
+@Data
 public class ProvinciaDTO {
-    private Integer id;
+    private Long id;
     private String nombre;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
 }

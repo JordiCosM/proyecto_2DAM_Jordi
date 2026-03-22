@@ -10,5 +10,7 @@ public interface ServicioMapper {
     @Mapping(source = "empresa.id", target = "idEmpresa")
     ServicioDTO toDTO(Servicio servicio);
 
+    @Mapping(target = "empresa", ignore = true)
+    @Mapping(target = "reservas", ignore = true)
     Servicio toEntity(ServicioDTO dto);
 }

@@ -11,5 +11,9 @@ public interface EmpresaMapper {
     @Mapping(source = "ciudad.id", target = "idCiudad")
     EmpresaDTO toDTO(Empresa empresa);
 
+    @Mapping(target = "usuario", ignore = true)
+    @Mapping(target = "ciudad", ignore = true)
+    @Mapping(target = "servicios", ignore = true)
+    @Mapping(target = "horarios", ignore = true)
     Empresa toEntity(EmpresaDTO dto);
 }

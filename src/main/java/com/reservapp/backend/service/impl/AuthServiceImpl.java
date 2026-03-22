@@ -10,9 +10,11 @@ import com.reservapp.backend.security.JwtService;
 import com.reservapp.backend.service.AuthService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthServiceImpl implements AuthService {
+
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -25,7 +27,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(AuthRequest request) {
-
         Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new BadRequestException("Credenciales incorrectas"));
 
@@ -38,10 +39,14 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public AuthResponse register(RegisterRequest request) {
-
         if (usuarioRepository.existsByEmail(request.getEmail())) {
             throw new BadRequestException("El email ya está registrado");
+        }
+
+        if (request.getRol() == Usuario.Rol.ADMIN) {
+            throw new BadRequestException("No puedes registrarte con ese rol");
         }
 
         Usuario nuevo = new Usuario();
@@ -50,7 +55,7 @@ public class AuthServiceImpl implements AuthService {
         nuevo.setEmail(request.getEmail());
         nuevo.setTelefono(request.getTelefono());
         nuevo.setPassword(passwordEncoder.encode(request.getPassword()));
-        nuevo.setRol(Usuario.Rol.cliente);
+        nuevo.setRol(request.getRol());
 
         usuarioRepository.save(nuevo);
 

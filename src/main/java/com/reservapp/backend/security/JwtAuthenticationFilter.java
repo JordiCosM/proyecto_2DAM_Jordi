@@ -1,6 +1,7 @@
 package com.reservapp.backend.security;
 
 import com.reservapp.backend.service.UsuarioService;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +16,7 @@ import java.io.IOException;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
     private final JwtService jwtService;
     private final UsuarioService usuarioService;
 
@@ -35,15 +37,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = header.substring(7);
-        String email = jwtService.extractEmail(token);
+        String email;
+
+        try {
+            email = jwtService.extractEmail(token);
+        } catch (JwtException e) {
+            chain.doFilter(request, response);
+            return;
+        }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails user = usuarioService.loadUserByUsername(email);
 
-            if (jwtService.validateToken(token)) {
+            if (jwtService.validateToken(token, user)) {
                 UsernamePasswordAuthenticationToken auth =
                         new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }

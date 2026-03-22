@@ -1,10 +1,7 @@
 package com.reservapp.backend.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -13,18 +10,19 @@ import java.time.LocalTime;
 @Table(name = "reservas")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Reserva {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_servicio", nullable = false)
     private Servicio servicio;
 
@@ -38,10 +36,11 @@ public class Reserva {
     private LocalTime horaFin;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('pendiente','confirmada','cancelada','finalizada') default 'pendiente'")
-    private Estado estado;
+    @Column(nullable = false, length = 20)
+    @Builder.Default
+    private Estado estado = Estado.PENDIENTE;
 
     public enum Estado {
-        pendiente, confirmada, cancelada, finalizada
+        PENDIENTE, CONFIRMADA, CANCELADA, FINALIZADA
     }
 }
