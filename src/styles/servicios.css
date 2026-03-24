@@ -1,0 +1,25 @@
+.servicio-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+    transition: box-shadow 0.2s ease;
+}
+
+.servicio-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.servicio-precio {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0d6efd;
+}
+
+.servicio-duracion {
+    font-size: 0.8rem;
+    background: #f0f0f0;
+    color: #495057;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+}
