@@ -1,0 +1,50 @@
+.perfil-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+    max-width: 600px;
+}
+
+.perfil-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #e7f1ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #0d6efd;
+}
+
+.perfil-nombre {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.perfil-rol-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 3px 12px;
+    border-radius: 20px;
+    background: #e7f1ff;
+    color: #0a58ca;
+}
+
+.perfil-seccion-titulo {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #6c757d;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.danger-zone {
+    border: 1px solid #f8d7da;
+    border-radius: 12px;
+    padding: 1.25rem;
+    max-width: 600px;
+}
