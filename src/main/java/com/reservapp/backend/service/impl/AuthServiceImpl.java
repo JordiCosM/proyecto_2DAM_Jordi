@@ -1,13 +1,12 @@
 package com.reservapp.backend.service.impl;
 
-import com.reservapp.backend.dto.AuthRequest;
-import com.reservapp.backend.dto.AuthResponse;
-import com.reservapp.backend.dto.RegisterRequest;
+import com.reservapp.backend.dto.*;
 import com.reservapp.backend.exception.BadRequestException;
 import com.reservapp.backend.model.Usuario;
 import com.reservapp.backend.repository.UsuarioRepository;
 import com.reservapp.backend.security.JwtService;
 import com.reservapp.backend.service.AuthService;
+import com.reservapp.backend.service.PasswordResetService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,11 +17,13 @@ public class AuthServiceImpl implements AuthService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final PasswordResetService passwordResetService;
 
-    public AuthServiceImpl(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
+    public AuthServiceImpl(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, JwtService jwtService, PasswordResetService passwordResetService) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.passwordResetService = passwordResetService;
     }
 
     @Override
@@ -35,7 +36,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         String token = jwtService.generateToken(usuario.getEmail());
-        return new AuthResponse(token);
+        return new AuthResponse(token, usuario.getId(), usuario.getNombre(), usuario.getEmail(), usuario.getRol().name());
     }
 
     @Override
@@ -60,6 +61,29 @@ public class AuthServiceImpl implements AuthService {
         usuarioRepository.save(nuevo);
 
         String token = jwtService.generateToken(nuevo.getEmail());
-        return new AuthResponse(token);
+        return new AuthResponse(token, nuevo.getId(), nuevo.getNombre(), nuevo.getEmail(), nuevo.getRol().name());
+    }
+
+    @Override
+    public void forgotPassword(ForgotPasswordRequest request) {
+        // No revelamos si el email existe o no por seguridad
+        usuarioRepository.findByEmail(request.getEmail())
+                .ifPresent(usuario -> passwordResetService.generarToken(usuario.getEmail()));
+    }
+
+    @Override
+    public void resetPassword(ResetPasswordRequest request) {
+        String email = passwordResetService.validarToken(request.getToken());
+
+        if (email == null) {
+            throw new BadRequestException("El token no es válido o ha expirado");
+        }
+
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new BadRequestException("Usuario no encontrado"));
+
+        usuario.setPassword(passwordEncoder.encode(request.getNuevaPassword()));
+        usuarioRepository.save(usuario);
+        passwordResetService.invalidarToken(request.getToken());
     }
 }
