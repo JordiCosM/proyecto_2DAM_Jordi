@@ -1,8 +1,6 @@
 package com.reservapp.backend.controller;
 
-import com.reservapp.backend.dto.AuthRequest;
-import com.reservapp.backend.dto.AuthResponse;
-import com.reservapp.backend.dto.RegisterRequest;
+import com.reservapp.backend.dto.*;
 import com.reservapp.backend.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,5 +29,19 @@ public class AuthController {
     @Operation(summary = "Registrar usuario")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authService.register(request));
+    }
+
+    @PostMapping("/forgot-password")
+    @Operation(summary = "Solicitar recuperación de contraseña")
+    public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        authService.forgotPassword(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/reset-password")
+    @Operation(summary = "Restablecer contraseña con token")
+    public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        return ResponseEntity.noContent().build();
     }
 }
