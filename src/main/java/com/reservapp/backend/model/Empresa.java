@@ -47,9 +47,12 @@ public class Empresa {
     @Column(length = 255)
     private String logoUrl;
 
-    @OneToMany(mappedBy = "empresa")
+    @OneToMany(mappedBy = "empresa", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Servicio> servicios = new ArrayList<>();
 
-    @OneToMany(mappedBy = "empresa")
+    @OneToMany(mappedBy = "empresa", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Horario> horarios = new ArrayList<>();
+
+    @OneToMany(mappedBy = "empresa", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Empleado> empleados = new ArrayList<>();
 }

@@ -3,6 +3,7 @@ package com.reservapp.backend.service.impl;
 import com.reservapp.backend.dto.ServicioDTO;
 import com.reservapp.backend.exception.ResourceNotFoundException;
 import com.reservapp.backend.mapper.ServicioMapper;
+import com.reservapp.backend.model.Reserva;
 import com.reservapp.backend.model.Servicio;
 import com.reservapp.backend.repository.EmpresaRepository;
 import com.reservapp.backend.repository.ServicioRepository;
@@ -18,8 +19,7 @@ public class ServicioServiceImpl implements ServicioService {
     private final ServicioMapper servicioMapper;
     private final EmpresaRepository empresaRepository;
 
-    public ServicioServiceImpl(ServicioRepository servicioRepository, ServicioMapper servicioMapper,
-                               EmpresaRepository empresaRepository) {
+    public ServicioServiceImpl(ServicioRepository servicioRepository, ServicioMapper servicioMapper, EmpresaRepository empresaRepository) {
         this.servicioRepository = servicioRepository;
         this.servicioMapper = servicioMapper;
         this.empresaRepository = empresaRepository;
@@ -30,8 +30,7 @@ public class ServicioServiceImpl implements ServicioService {
     public ServicioDTO crearServicio(ServicioDTO dto) {
         Servicio servicio = servicioMapper.toEntity(dto);
 
-        servicio.setEmpresa(empresaRepository.findById(dto.getIdEmpresa())
-                .orElseThrow(() -> new ResourceNotFoundException("Empresa no encontrada")));
+        servicio.setEmpresa(empresaRepository.findById(dto.getIdEmpresa()).orElseThrow(() -> new ResourceNotFoundException("Empresa no encontrada")));
 
         return servicioMapper.toDTO(servicioRepository.save(servicio));
     }
@@ -39,17 +38,16 @@ public class ServicioServiceImpl implements ServicioService {
     @Override
     @Transactional
     public ServicioDTO actualizarServicio(Long id, ServicioDTO dto) {
-        Servicio servicio = servicioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Servicio no encontrado"));
+        Servicio servicio = servicioRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Servicio no encontrado"));
 
         servicio.setNombre(dto.getNombre());
         servicio.setDescripcion(dto.getDescripcion());
         servicio.setDuracion(dto.getDuracion());
         servicio.setPrecio(dto.getPrecio());
+        servicio.setCapacidad(dto.getCapacidad() != null ? dto.getCapacidad() : servicio.getCapacidad());
 
         if (dto.getIdEmpresa() != null) {
-            servicio.setEmpresa(empresaRepository.findById(dto.getIdEmpresa())
-                    .orElseThrow(() -> new ResourceNotFoundException("Empresa no encontrada")));
+            servicio.setEmpresa(empresaRepository.findById(dto.getIdEmpresa()).orElseThrow(() -> new ResourceNotFoundException("Empresa no encontrada")));
         }
 
         return servicioMapper.toDTO(servicioRepository.save(servicio));
@@ -57,8 +55,7 @@ public class ServicioServiceImpl implements ServicioService {
 
     @Override
     public ServicioDTO obtenerServicioPorId(Long id) {
-        Servicio servicio = servicioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Servicio no encontrado"));
+        Servicio servicio = servicioRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Servicio no encontrado"));
         return servicioMapper.toDTO(servicio);
     }
 
@@ -75,9 +72,10 @@ public class ServicioServiceImpl implements ServicioService {
     @Override
     @Transactional
     public void eliminarServicio(Long id) {
-        if (!servicioRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Servicio no encontrado");
-        }
-        servicioRepository.deleteById(id);
+        Servicio servicio = servicioRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Servicio no encontrado"));
+
+        servicio.getReservas().stream().filter(r -> r.getEstado() == Reserva.Estado.PENDIENTE || r.getEstado() == Reserva.Estado.CONFIRMADA).forEach(r -> r.setEstado(Reserva.Estado.CANCELADA));
+
+        servicioRepository.delete(servicio);
     }
 }

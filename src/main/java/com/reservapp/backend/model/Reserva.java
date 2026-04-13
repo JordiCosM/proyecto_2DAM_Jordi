@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "reservas")
@@ -39,6 +41,10 @@ public class Reserva {
     @Column(nullable = false, length = 20)
     @Builder.Default
     private Estado estado = Estado.PENDIENTE;
+
+    @ManyToMany
+    @JoinTable(name = "reserva_empleados", joinColumns = @JoinColumn(name = "id_reserva"), inverseJoinColumns = @JoinColumn(name = "id_empleado"))
+    private List<Empleado> empleados = new ArrayList<>();
 
     public enum Estado {
         PENDIENTE, CONFIRMADA, CANCELADA, FINALIZADA

@@ -2,7 +2,9 @@ package com.reservapp.backend.service.impl;
 
 import com.reservapp.backend.dto.*;
 import com.reservapp.backend.exception.BadRequestException;
+import com.reservapp.backend.model.Empleado;
 import com.reservapp.backend.model.Usuario;
+import com.reservapp.backend.repository.EmpleadoRepository;
 import com.reservapp.backend.repository.UsuarioRepository;
 import com.reservapp.backend.security.JwtService;
 import com.reservapp.backend.service.AuthService;
@@ -11,16 +13,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 public class AuthServiceImpl implements AuthService {
 
     private final UsuarioRepository usuarioRepository;
+    private final EmpleadoRepository empleadoRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final PasswordResetService passwordResetService;
 
-    public AuthServiceImpl(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, JwtService jwtService, PasswordResetService passwordResetService) {
+    public AuthServiceImpl(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder, JwtService jwtService, PasswordResetService passwordResetService, EmpleadoRepository empleadoRepository) {
         this.usuarioRepository = usuarioRepository;
+        this.empleadoRepository = empleadoRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.passwordResetService = passwordResetService;
@@ -28,15 +34,29 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(AuthRequest request) {
-        Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new BadRequestException("Credenciales incorrectas"));
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(request.getEmail());
+        if (usuarioOpt.isPresent()) {
+            Usuario usuario = usuarioOpt.get();
+            if (!passwordEncoder.matches(request.getPassword(), usuario.getPassword())) {
+                throw new BadRequestException("Credenciales incorrectas");
+            }
 
-        if (!passwordEncoder.matches(request.getPassword(), usuario.getPassword())) {
+            String token = jwtService.generateToken(usuario.getEmail());
+            return new AuthResponse(token, usuario.getId(), usuario.getNombre(), usuario.getEmail(), usuario.getRol().name(), "USUARIO", null);
+        }
+
+        Empleado empleado = empleadoRepository.findByEmail(request.getEmail()).orElseThrow(() -> new BadRequestException("Credenciales incorrectas"));
+
+        if (!empleado.getActivo()) {
+            throw new BadRequestException("El empleado está desactivado");
+        }
+
+        if (!passwordEncoder.matches(request.getPassword(), empleado.getPassword())) {
             throw new BadRequestException("Credenciales incorrectas");
         }
 
-        String token = jwtService.generateToken(usuario.getEmail());
-        return new AuthResponse(token, usuario.getId(), usuario.getNombre(), usuario.getEmail(), usuario.getRol().name());
+        String token = jwtService.generateToken(empleado.getEmail());
+        return new AuthResponse(token, empleado.getId(), empleado.getNombre(), empleado.getEmail(), empleado.getRol().name(), "EMPLEADO", empleado.getEmpresa().getId());
     }
 
     @Override
@@ -61,14 +81,12 @@ public class AuthServiceImpl implements AuthService {
         usuarioRepository.save(nuevo);
 
         String token = jwtService.generateToken(nuevo.getEmail());
-        return new AuthResponse(token, nuevo.getId(), nuevo.getNombre(), nuevo.getEmail(), nuevo.getRol().name());
+        return new AuthResponse(token, nuevo.getId(), nuevo.getNombre(), nuevo.getEmail(), nuevo.getRol().name(), "USUARIO", null);
     }
 
     @Override
     public void forgotPassword(ForgotPasswordRequest request) {
-        // No revelamos si el email existe o no por seguridad
-        usuarioRepository.findByEmail(request.getEmail())
-                .ifPresent(usuario -> passwordResetService.generarToken(usuario.getEmail()));
+        usuarioRepository.findByEmail(request.getEmail()).ifPresent(usuario -> passwordResetService.generarToken(usuario.getEmail()));
     }
 
     @Override

@@ -41,21 +41,21 @@ public class EmpresaController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN', 'CLIENTE')")
     @Operation(summary = "Crear una empresa")
     public ResponseEntity<EmpresaDTO> create(@Valid @RequestBody EmpresaDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(empresaService.crearEmpresa(dto));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN', 'ADMIN_EMPRESA')")
     @Operation(summary = "Actualizar una empresa")
     public ResponseEntity<EmpresaDTO> update(@PathVariable Long id, @Valid @RequestBody EmpresaDTO dto) {
         return ResponseEntity.ok(empresaService.actualizarEmpresa(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN', 'ADMIN_EMPRESA')")
     @Operation(summary = "Eliminar una empresa")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         empresaService.eliminarEmpresa(id);

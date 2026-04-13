@@ -41,21 +41,21 @@ public class HorarioController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN', 'ADMIN_EMPRESA')")
     @Operation(summary = "Crear un horario")
     public ResponseEntity<HorarioDTO> create(@Valid @RequestBody HorarioDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(horarioService.crearHorario(dto));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN', 'ADMIN_EMPRESA')")
     @Operation(summary = "Actualizar un horario")
     public ResponseEntity<HorarioDTO> update(@PathVariable Long id, @Valid @RequestBody HorarioDTO dto) {
         return ResponseEntity.ok(horarioService.actualizarHorario(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN', 'ADMIN_EMPRESA')")
     @Operation(summary = "Eliminar un horario")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         horarioService.eliminarHorario(id);
