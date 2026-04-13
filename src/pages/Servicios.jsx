@@ -1,20 +1,22 @@
 import { useState, useEffect } from 'react'
-import { useAuth } from '../context/AuthContext'
-import { getEmpresasByUsuario } from '../services/empresaService'
+import useAuth from '../hooks/useAuth'
+import useEmpresas from '../hooks/useEmpresas'
 import { getServiciosByEmpresa, createServicio, updateServicio, deleteServicio } from '../services/servicioService'
 import useFetch from '../hooks/useFetch'
 import useToast from '../hooks/useToast'
 import ServicioFormModal from '../components/servicios/ServicioFormModal'
 import ConfirmModal from '../components/common/ConfirmModal'
 import Toast from '../components/common/Toast'
+import SpinnerPage from '../components/common/SpinnerPage'
+import EmptyState from '../components/common/EmptyState'
+import EmpresaSelector from '../components/common/EmpresaSelector'
+import { puedeEditar } from '../utils/permisos'
 import '../styles/servicios.css'
 import '../styles/common.css'
 
 function Servicios() {
     const { usuario } = useAuth()
-    const { data: empresas, loading: loadingEmpresas } = useFetch(
-        () => getEmpresasByUsuario(usuario.id), [usuario.id]
-    )
+    const { data: empresas, loading: loadingEmpresas } = useEmpresas()
     const [empresaActiva, setEmpresaActiva] = useState(null)
     const { data: servicios, loading: loadingServicios, refetch } = useFetch(
         () => empresaActiva ? getServiciosByEmpresa(empresaActiva.id) : Promise.resolve([]),
@@ -25,9 +27,12 @@ function Servicios() {
     const [servicioEditando, setServicioEditando] = useState(null)
     const [servicioBorrando, setServicioBorrando] = useState(null)
     const [loadingDelete, setLoadingDelete] = useState(false)
+    console.log(servicios);
+    
+    const canEdit = puedeEditar(usuario)
 
     useEffect(() => {
-        if (empresas?.length === 1 && !empresaActiva) setEmpresaActiva(empresas[0])
+        if (empresas?.length && !empresaActiva) setEmpresaActiva(empresas[0])
     }, [empresas])
 
     const handleGuardar = async (form) => {
@@ -63,53 +68,35 @@ function Servicios() {
     const abrirEditar = (servicio) => { setServicioEditando(servicio); setModalForm(true) }
     const abrirNuevo = () => { setServicioEditando(null); setModalForm(true) }
 
-    if (loadingEmpresas) {
-        return <div className="spinner-fullpage"><div className="spinner-border text-primary" /></div>
-    }
+    if (loadingEmpresas) return <SpinnerPage />
 
     return (
         <>
             <div className="d-flex align-items-center justify-content-between mb-4">
                 <h4 className="fw-bold mb-0">Servicios</h4>
-                {empresaActiva && (
+                {canEdit && empresaActiva && (
                     <button className="btn btn-primary btn-sm" onClick={abrirNuevo}>
                         <i className="bi bi-plus-lg me-1" />Nuevo servicio
                     </button>
                 )}
             </div>
 
-            {empresas?.length > 1 && (
-                <div className="mb-4">
-                    <p className="text-muted small mb-2">Selecciona una empresa</p>
-                    <div className="d-flex flex-wrap gap-2">
-                        {empresas.map((e) => (
-                            <button
-                                key={e.id}
-                                className={`empresa-selector-btn ${empresaActiva?.id === e.id ? 'selected' : ''}`}
-                                onClick={() => setEmpresaActiva(e)}
-                            >
-                                <i className="bi bi-building me-2" />{e.nombre}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            )}
+            <EmpresaSelector
+                empresas={empresas}
+                empresaActiva={empresaActiva}
+                onSeleccionar={setEmpresaActiva}
+            />
 
             {!empresaActiva ? (
-                <div className="empty-state">
-                    <i className="bi bi-building" />
-                    <p>Selecciona una empresa para ver sus servicios</p>
-                </div>
+                <EmptyState icono="bi-building" texto="Selecciona una empresa para ver sus servicios" />
             ) : loadingServicios ? (
-                <div className="spinner-fullpage"><div className="spinner-border text-primary" /></div>
+                <SpinnerPage />
             ) : !servicios?.length ? (
-                <div className="empty-state">
-                    <i className="bi bi-grid" />
-                    <p>Esta empresa no tiene servicios todavía</p>
+                <EmptyState icono="bi-grid" texto="Esta empresa no tiene servicios todavía">
                     <button className="btn btn-primary btn-sm" onClick={abrirNuevo}>
                         <i className="bi bi-plus-lg me-1" />Crear servicio
                     </button>
-                </div>
+                </EmptyState>
             ) : (
                 <div className="row g-3">
                     {servicios.map((servicio) => (
@@ -128,14 +115,16 @@ function Servicios() {
                                             <i className="bi bi-clock me-1" />{servicio.duracion} min
                                         </span>
                                     </div>
-                                    <div className="d-flex gap-2">
-                                        <button className="btn btn-outline-primary btn-sm flex-grow-1" onClick={() => abrirEditar(servicio)}>
-                                            <i className="bi bi-pencil me-1" />Editar
-                                        </button>
-                                        <button className="btn btn-outline-danger btn-sm" onClick={() => setServicioBorrando(servicio)}>
-                                            <i className="bi bi-trash" />
-                                        </button>
-                                    </div>
+                                    {canEdit && (
+                                        <div className="d-flex gap-2">
+                                            <button className="btn btn-outline-primary btn-sm flex-grow-1" onClick={() => abrirEditar(servicio)}>
+                                                <i className="bi bi-pencil me-1" />Editar
+                                            </button>
+                                            <button className="btn btn-outline-danger btn-sm" onClick={() => setServicioBorrando(servicio)}>
+                                                <i className="bi bi-trash" />
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -143,23 +132,21 @@ function Servicios() {
                 </div>
             )}
 
-            {modalForm && (
-                <ServicioFormModal
-                    servicio={servicioEditando}
-                    empresas={empresas || []}
-                    onGuardar={handleGuardar}
-                    onCerrar={() => { setModalForm(false); setServicioEditando(null) }}
-                />
-            )}
+            <ServicioFormModal
+                show={modalForm}
+                servicio={servicioEditando}
+                empresas={empresas || []}
+                onGuardar={handleGuardar}
+                onCerrar={() => { setModalForm(false); setServicioEditando(null) }}
+            />
 
-            {servicioBorrando && (
-                <ConfirmModal
-                    mensaje={`¿Seguro que quieres eliminar "${servicioBorrando.nombre}"?`}
-                    onConfirmar={handleEliminar}
-                    onCerrar={() => setServicioBorrando(null)}
-                    loading={loadingDelete}
-                />
-            )}
+            <ConfirmModal
+                show={!!servicioBorrando}
+                mensaje={`¿Seguro que quieres eliminar "${servicioBorrando?.nombre}"?`}
+                onConfirmar={handleEliminar}
+                onCerrar={() => setServicioBorrando(null)}
+                loading={loadingDelete}
+            />
 
             {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onCerrar={cerrarToast} />}
         </>

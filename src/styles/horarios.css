@@ -39,3 +39,11 @@
     color: #adb5bd;
     font-size: 0.75rem;
 }
+
+@media (max-width: 576px) {
+    .horario-row {
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 12px 0;
+    }
+}

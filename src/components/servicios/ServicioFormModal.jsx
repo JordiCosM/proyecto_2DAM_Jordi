@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 
 const FORM_INICIAL = {
-    nombre: '', descripcion: '', duracion: '', precio: ''
+    nombre: '', descripcion: '', duracion: '', precio: '', capacidad: ''
 }
 
-function ServicioFormModal({ servicio, empresas, onGuardar, onCerrar }) {
+function ServicioFormModal({ show, servicio, empresas, onGuardar, onCerrar }) {    
     const [form, setForm] = useState(FORM_INICIAL)
     const [idEmpresa, setIdEmpresa] = useState('')
     const [loading, setLoading] = useState(false)
@@ -13,12 +13,15 @@ function ServicioFormModal({ servicio, empresas, onGuardar, onCerrar }) {
     const bsModal = useRef(null)
 
     useEffect(() => {
-        if (modalRef.current && window.bootstrap) {
-            bsModal.current = new window.bootstrap.Modal(modalRef.current, { backdrop: 'static' })
-            bsModal.current.show()
-        }
-        return () => bsModal.current?.dispose()
+        if (!modalRef.current || !window.bootstrap) return
+        bsModal.current = new window.bootstrap.Modal(modalRef.current, { backdrop: 'static' })
+        return () => { bsModal.current?.dispose(); bsModal.current = null }
     }, [])
+
+    useEffect(() => {
+        if (!bsModal.current) return
+        show ? bsModal.current.show() : bsModal.current.hide()
+    }, [show])
 
     useEffect(() => {
         if (servicio) {
@@ -27,14 +30,15 @@ function ServicioFormModal({ servicio, empresas, onGuardar, onCerrar }) {
                 descripcion: servicio.descripcion || '',
                 duracion: servicio.duracion || '',
                 precio: servicio.precio || '',
+                capacidad: servicio.capacidad != null ? servicio.capacidad : '',
             })
             setIdEmpresa(servicio.idEmpresa || '')
         } else {
             setForm(FORM_INICIAL)
-            setIdEmpresa(empresas.length === 1 ? empresas[0].id : '')
+            setIdEmpresa(empresas?.length === 1 ? empresas[0].id : '')
         }
-    }, [servicio])
-
+        setError(null)
+    }, [servicio, show])
     const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
 
     const handleSubmit = async (e) => {
@@ -43,18 +47,18 @@ function ServicioFormModal({ servicio, empresas, onGuardar, onCerrar }) {
         setLoading(true)
         setError(null)
         try {
-            await onGuardar({ ...form, idEmpresa, duracion: Number(form.duracion), precio: Number(form.precio) })
-            bsModal.current?.hide()
+            await onGuardar({
+                ...form,
+                idEmpresa,
+                duracion: Number(form.duracion),
+                precio: Number(form.precio),
+                capacidad: Number(form.capacidad)
+            })
         } catch {
             setError('Error al guardar el servicio.')
         } finally {
             setLoading(false)
         }
-    }
-
-    const handleCerrar = () => {
-        bsModal.current?.hide()
-        onCerrar()
     }
 
     return (
@@ -65,7 +69,7 @@ function ServicioFormModal({ servicio, empresas, onGuardar, onCerrar }) {
                         <h5 className="modal-title fw-semibold">
                             {servicio ? 'Editar servicio' : 'Nuevo servicio'}
                         </h5>
-                        <button className="btn-close" onClick={handleCerrar} disabled={loading} />
+                        <button className="btn-close" onClick={onCerrar} disabled={loading} />
                     </div>
 
                     <div className="modal-body">
@@ -140,12 +144,24 @@ function ServicioFormModal({ servicio, empresas, onGuardar, onCerrar }) {
                                         placeholder="Ej: 15.00"
                                     />
                                 </div>
+                                <div className="col-md-4">
+                                    <label className="form-label">Capacidad <span className="text-muted">(personas)</span></label>
+                                    <input
+                                        type="number"
+                                        name="capacidad"
+                                        className="form-control"
+                                        value={form.capacidad}
+                                        onChange={handleChange}
+                                        required min={1}
+                                        placeholder="Ej: 5"
+                                    />
+                                </div>
                             </div>
                         </form>
                     </div>
 
                     <div className="modal-footer">
-                        <button className="btn btn-light" onClick={handleCerrar} disabled={loading}>Cancelar</button>
+                        <button className="btn btn-light" onClick={onCerrar} disabled={loading}>Cancelar</button>
                         <button className="btn btn-primary" type="submit" form="servicio-form" disabled={loading}>
                             {loading
                                 ? <><span className="spinner-border spinner-border-sm me-2" />Guardando...</>

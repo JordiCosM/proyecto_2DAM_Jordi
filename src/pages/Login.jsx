@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import useAuth from '../hooks/useAuth'
 import { login as loginService } from '../services/authService'
 import { get } from '../services/api'
 import '../styles/auth.css'
@@ -22,15 +22,40 @@ function Login() {
 
         try {
             const respuesta = await loginService(form.email, form.password)
+            localStorage.setItem('token', respuesta.token)
 
-            const usuario = {
-                id: respuesta.idUsuario,
-                nombre: respuesta.nombre,
-                email: respuesta.email,
-                rol: respuesta.rol,
+            const { get } = await import('../services/api')
+
+            let usuarioCompleto
+
+            if (respuesta.tipo === 'EMPLEADO') {
+                const datos = await get(`/empleados/${respuesta.idUsuario}`)
+                usuarioCompleto = {
+                    id: respuesta.idUsuario,
+                    nombre: datos.nombre,
+                    apellidos: datos.apellidos,
+                    email: datos.email,
+                    telefono: datos.telefono,
+                    rol: datos.rol,
+                    tipo: 'EMPLEADO',
+                    idEmpresa: respuesta.idEmpresa,
+                    activo: datos.activo,
+                }
+            } else {
+                const datos = await get(`/usuarios/${respuesta.idUsuario}`)
+                usuarioCompleto = {
+                    id: respuesta.idUsuario,
+                    nombre: datos.nombre,
+                    apellidos: datos.apellidos,
+                    email: datos.email,
+                    telefono: datos.telefono,
+                    rol: datos.rol,
+                    tipo: 'USUARIO',
+                    idEmpresa: null,
+                }
             }
 
-            login(respuesta.token, usuario)
+            login(respuesta.token, usuarioCompleto)
             navigate('/home')
         } catch (err) {
             setError('Email o contraseña incorrectos')

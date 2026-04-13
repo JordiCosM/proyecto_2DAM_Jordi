@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import { useEmpresa } from '../context/EmpresaContext'
-import { updateUsuario, deleteUsuario } from '../services/usuarioService'
+import useAuth from '../hooks/useAuth'
+import useEmpresas from '../hooks/useEmpresas'
+import { updateUsuario, deleteUsuario, getUsuario } from '../services/usuarioService'
 import useToast from '../hooks/useToast'
 import PerfilCabecera from '../components/perfil/PerfilCabecera'
 import PerfilForm from '../components/perfil/PerfilForm'
@@ -13,7 +13,7 @@ import '../styles/perfil.css'
 
 function Perfil() {
     const { usuario, login, logout } = useAuth()
-    const { setTieneEmpresa } = useEmpresa()
+    const { setTieneEmpresa } = useEmpresas()
     const navigate = useNavigate()
     const { toast, mostrarError, mostrarExito, cerrarToast } = useToast()
 
@@ -27,15 +27,17 @@ function Perfil() {
     const [loadingDelete, setLoadingDelete] = useState(false)
 
     useEffect(() => {
-        if (usuario) {
-            setForm({
-                nombre: usuario.nombre || '',
-                apellidos: usuario.apellidos || '',
-                email: usuario.email || '',
-                telefono: usuario.telefono || '',
+        if (usuario?.id) {
+            getUsuario(usuario.id).then((datos) => {
+                setForm({
+                    nombre: datos.nombre || '',
+                    apellidos: datos.apellidos || '',
+                    email: datos.email || '',
+                    telefono: datos.telefono || '',
+                })
             })
         }
-    }, [usuario])
+    }, [usuario?.id])
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value })
@@ -96,14 +98,13 @@ function Perfil() {
 
             <DangerZone onEliminar={() => setModalBorrar(true)} />
 
-            {modalBorrar && (
-                <ConfirmModal
-                    mensaje="¿Seguro que quieres eliminar tu cuenta? Perderás todos tus datos, empresas y reservas. Esta acción no se puede deshacer."
-                    onConfirmar={handleEliminarCuenta}
-                    onCerrar={() => setModalBorrar(false)}
-                    loading={loadingDelete}
-                />
-            )}
+            <ConfirmModal
+                show={modalBorrar}
+                mensaje="¿Seguro que quieres eliminar tu cuenta? Esta acción no se puede deshacer."
+                onConfirmar={handleEliminarCuenta}
+                onCerrar={() => setModalBorrar(false)}
+                loading={loadingDelete}
+            />
 
             {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onCerrar={cerrarToast} />}
         </>

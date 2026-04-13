@@ -42,3 +42,83 @@
 .reservas-tabla-card .table tr:hover td {
     background: #fafafa;
 }
+
+.cliente-telefono {
+    color: #6c757d;
+}
+
+.cliente-nombre {
+    color: #495057;
+    margin-right: 10px;
+}
+
+@media (max-width: 768px) {
+    .reservas-tabla-card .table td {
+        white-space: nowrap;
+    }
+
+    .cliente-nombre {
+        display: block;
+        white-space: nowrap;
+    }
+
+    .cliente-telefono {
+        display: block;
+        font-size: 0.78rem;
+        white-space: nowrap;
+    }
+
+    .reservas-tabla-card .table th,
+    .reservas-tabla-card .table td {
+        font-size: 0.78rem;
+        padding: 8px 10px;
+    }
+
+    .reservas-tabla-card .table th:nth-child(3),
+    .reservas-tabla-card .table td:nth-child(3) {
+        display: none;
+    }
+}
+
+.cliente-encontrado {
+    background: #d1e7dd;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    color: #0f5132;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cliente-nuevo {
+    background: #fff3cd;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    color: #856404;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.empleado-check-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: background 0.15s;
+}
+
+.empleado-check-item:hover {
+    background: #f8f9fa;
+}
+
+.empleado-check-item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}

@@ -1,8 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
-import DropdownEstado from '../reservas/DropdownEstado'
 import '../../styles/home.css'
 
-function EmpresaReservas({ empresa, servicios, reservasPorServicio, onCambiarEstado }) {
+function EmpresaReservas({ empresa, servicios, reservasPorServicio }) {
     const reservasDelDia = (idServicio) => reservasPorServicio[idServicio] || []
     const hayReservas = servicios.some((s) => reservasDelDia(s.id).length > 0)
 
@@ -59,11 +57,31 @@ function EmpresaReservas({ empresa, servicios, reservasPorServicio, onCambiarEst
                                                     <i className="bi bi-clock me-1 text-muted" style={{ fontSize: '0.75rem' }} />
                                                     {reserva.horaInicio.slice(0, 5)} – {reserva.horaFin.slice(0, 5)}
                                                 </span>
+
                                                 <span className="reserva-info">
                                                     <i className="bi bi-person me-1 text-muted" style={{ fontSize: '0.75rem' }} />
-                                                    {reserva.nombreUsuario || `Usuario #${reserva.idUsuario}`}
+                                                    <span className="cliente-nombre">{reserva.nombreCliente}</span>
+                                                    {reserva.telefonoCliente && (
+                                                        <span className="cliente-telefono">
+                                                            <i className="bi bi-telephone me-1" />{reserva.telefonoCliente}
+                                                        </span>
+                                                    )}
                                                 </span>
-                                                <DropdownEstado reserva={reserva} onCambiarEstado={onCambiarEstado} />
+
+                                                {reserva.nombresEmpleados?.length > 0 ? (
+                                                    <div className="reserva-empleados">
+                                                        {reserva.nombresEmpleados.map((nombre, i) => (
+                                                            <span key={i} className="reserva-empleado-tag">
+                                                                <i className="bi bi-person-badge" style={{ fontSize: '0.7rem' }} />
+                                                                {nombre}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                ) : <div />}
+
+                                                <span className={`estado-badge estado-${reserva.estado}`}>
+                                                    {reserva.estado}
+                                                </span>
                                             </div>
                                         ))}
                                 </div>
