@@ -36,30 +36,55 @@
 }
 
 .reserva-item {
-    display: flex;
+    display: grid;
+    grid-template-columns: 110px 1fr auto auto;
     align-items: center;
-    justify-content: space-between;
-    padding: 8px 14px;
+    padding: 10px 14px;
     border-top: 1px solid #f0f0f0;
     font-size: 0.85rem;
+    gap: 12px;
 }
 
 .reserva-item:hover {
     background: #fafafa;
 }
 
+/* .reserva-item>.d-flex {
+    gap: 12px;
+} */
+
 .reserva-hora {
     font-weight: 600;
     color: #212529;
-    min-width: 100px;
+    white-space: nowrap;
 }
 
 .reserva-info {
     color: #495057;
-    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.cliente-nombre {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cliente-telefono {
+    font-size: 0.78rem;
+    color: #6c757d;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .estado-badge {
+    display: inline-block;
+    min-width: 110px;
+    text-align: center;
+    white-space: nowrap;
     font-size: 0.72rem;
     padding: 3px 8px;
     border-radius: 20px;
@@ -99,4 +124,67 @@
     border: none;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     border-radius: 12px;
+}
+
+.reserva-empleados {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: flex-end;
+}
+
+.reserva-empleado-tag {
+    background: #f0f0f0;
+    border-radius: 20px;
+    padding: 2px 8px;
+    font-size: 0.72rem;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .reserva-item {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .reserva-hora {
+        font-size: 0.8rem;
+    }
+
+    .reserva-info {
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .cliente-nombre {
+        font-size: 0.82rem;
+    }
+
+    .cliente-telefono {
+        font-size: 0.75rem;
+        width: 100%;
+    }
+
+    .estado-badge {
+        font-size: 0.68rem;
+        padding: 3px 6px;
+        min-width: 80px;
+        align-self: flex-end;
+    }
+
+    .reserva-empleados {
+        width: 100%;
+        padding-top: 4px;
+        border-top: 1px solid #f0f0f0;
+        justify-content: flex-start;
+    }
 }

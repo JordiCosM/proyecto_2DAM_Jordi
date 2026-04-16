@@ -4,7 +4,7 @@ const DIAS = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DO
 
 const FORM_INICIAL = { dia: 'LUNES', apertura: '', cierre: '' }
 
-function HorarioFormModal({ horario, idEmpresa, onGuardar, onCerrar }) {
+function HorarioFormModal({ show, horario, idEmpresa, diasOcupados = [], onGuardar, onCerrar }) {
     const [form, setForm] = useState(FORM_INICIAL)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
@@ -12,12 +12,15 @@ function HorarioFormModal({ horario, idEmpresa, onGuardar, onCerrar }) {
     const bsModal = useRef(null)
 
     useEffect(() => {
-        if (modalRef.current && window.bootstrap) {
-            bsModal.current = new window.bootstrap.Modal(modalRef.current, { backdrop: 'static' })
-            bsModal.current.show()
-        }
-        return () => bsModal.current?.dispose()
+        if (!modalRef.current || !window.bootstrap) return
+        bsModal.current = new window.bootstrap.Modal(modalRef.current, { backdrop: 'static' })
+        return () => { bsModal.current?.dispose(); bsModal.current = null }
     }, [])
+
+    useEffect(() => {
+        if (!bsModal.current) return
+        show ? bsModal.current.show() : bsModal.current.hide()
+    }, [show])
 
     useEffect(() => {
         if (horario) {
@@ -29,6 +32,7 @@ function HorarioFormModal({ horario, idEmpresa, onGuardar, onCerrar }) {
         } else {
             setForm(FORM_INICIAL)
         }
+        setError(null)
     }, [horario])
 
     const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
@@ -36,7 +40,7 @@ function HorarioFormModal({ horario, idEmpresa, onGuardar, onCerrar }) {
     const handleSubmit = async (e) => {
         e.preventDefault()
         if (form.apertura >= form.cierre) {
-            setError('La hora de apertura debe ser anterior al cierre.')
+            setError('La hora de apertura debe ser anterior al cierre.');
             return
         }
         setLoading(true)
@@ -48,17 +52,11 @@ function HorarioFormModal({ horario, idEmpresa, onGuardar, onCerrar }) {
                 apertura: `${form.apertura}:00`,
                 cierre: `${form.cierre}:00`,
             })
-            bsModal.current?.hide()
         } catch {
             setError('Error al guardar el horario.')
         } finally {
             setLoading(false)
         }
-    }
-
-    const handleCerrar = () => {
-        bsModal.current?.hide()
-        onCerrar()
     }
 
     return (
@@ -69,7 +67,7 @@ function HorarioFormModal({ horario, idEmpresa, onGuardar, onCerrar }) {
                         <h5 className="modal-title fw-semibold">
                             {horario ? 'Editar horario' : 'Nuevo horario'}
                         </h5>
-                        <button className="btn-close" onClick={handleCerrar} disabled={loading} />
+                        <button className="btn-close" onClick={onCerrar} disabled={loading} />
                     </div>
 
                     <div className="modal-body">
@@ -79,14 +77,8 @@ function HorarioFormModal({ horario, idEmpresa, onGuardar, onCerrar }) {
                             <div className="row g-3">
                                 <div className="col-12">
                                     <label className="form-label">Día</label>
-                                    <select
-                                        name="dia"
-                                        className="form-select"
-                                        value={form.dia}
-                                        onChange={handleChange}
-                                        disabled={!!horario}
-                                    >
-                                        {DIAS.map((d) => (
+                                    <select name="dia" className="form-select" value={form.dia} onChange={handleChange} disabled={!!horario}>
+                                        {DIAS.filter((d) => !diasOcupados.includes(d) || d === horario?.dia).map((d) => (
                                             <option key={d} value={d}>{d.charAt(0) + d.slice(1).toLowerCase()}</option>
                                         ))}
                                     </select>
@@ -118,11 +110,11 @@ function HorarioFormModal({ horario, idEmpresa, onGuardar, onCerrar }) {
                     </div>
 
                     <div className="modal-footer">
-                        <button className="btn btn-light" onClick={handleCerrar} disabled={loading}>Cancelar</button>
+                        <button className="btn btn-light" onClick={onCerrar} disabled={loading}>Cancelar</button>
                         <button className="btn btn-primary" type="submit" form="horario-form" disabled={loading}>
                             {loading
                                 ? <><span className="spinner-border spinner-border-sm me-2" />Guardando...</>
-                                : <><i className="bi bi-check-lg me-2" />Guardar</>}
+                                : <>Guardar</>}
                         </button>
                     </div>
                 </div>

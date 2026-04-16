@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { useEmpresa } from '../../context/EmpresaContext'
+import useEmpresa from '../../hooks/useEmpresa'
 import '../../styles/navbar.css'
 
 function Navbar({ onToggleSidebar, onToggleCollapse, collapsed }) {
@@ -42,11 +42,6 @@ function Navbar({ onToggleSidebar, onToggleCollapse, collapsed }) {
                         <span className="dropdown-item-text small text-muted">{usuario?.email}</span>
                     </li>
                     <li><hr className="dropdown-divider" /></li>
-                    <li>
-                        <button className="dropdown-item" onClick={() => navigate('/perfil')}>
-                            <i className="bi bi-person me-2" />Mi perfil
-                        </button>
-                    </li>
                     <li>
                         <button className="dropdown-item text-danger" onClick={handleLogout}>
                             <i className="bi bi-box-arrow-right me-2" />Cerrar sesión

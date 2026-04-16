@@ -1,13 +1,10 @@
 import { createContext, useContext, useState } from 'react'
-import { useEmpresa } from './EmpresaContext'
 
-const AuthContext = createContext(null)
+export const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
     const [token, setToken] = useState(localStorage.getItem('token'))
-    const [usuario, setUsuario] = useState(
-        JSON.parse(localStorage.getItem('usuario') || 'null')
-    )
+    const [usuario, setUsuario] = useState(JSON.parse(localStorage.getItem('usuario') || 'null'))
 
     const login = (token, usuario) => {
         localStorage.setItem('token', token)

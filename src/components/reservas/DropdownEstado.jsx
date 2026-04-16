@@ -9,12 +9,16 @@ function DropdownEstado({ reserva, onCambiarEstado }) {
     const badgeRef = useRef(null)
     const menuRef = useRef(null)
 
-    const handleToggle = () => {
-        if (!abierto && badgeRef.current) {
-            const rect = badgeRef.current.getBoundingClientRect()
+    const handleToggle = (e) => {
+        e.stopPropagation()
+        const rect = badgeRef.current.getBoundingClientRect()
+        if (!abierto) {
             setPos({
                 top: rect.bottom + window.scrollY + 4,
-                left: rect.right + window.scrollX - 160,
+                left: Math.min(
+                    rect.right + window.scrollX - 160,
+                    window.innerWidth - 170
+                ),
             })
         }
         setAbierto(!abierto)

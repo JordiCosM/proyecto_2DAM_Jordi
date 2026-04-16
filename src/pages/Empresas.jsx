@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useAuth } from '../context/AuthContext'
+import useAuth from '../hooks/useAuth'
 import { getEmpresasByUsuario, createEmpresa, updateEmpresa, deleteEmpresa } from '../services/empresaService'
 import useFetch from '../hooks/useFetch'
 import useToast from '../hooks/useToast'
@@ -121,22 +121,20 @@ function Empresas() {
                 </div>
             )}
 
-            {modalForm && (
-                <EmpresaFormModal
-                    empresa={empresaEditando}
-                    onGuardar={handleGuardar}
-                    onCerrar={() => { setModalForm(false); setEmpresaEditando(null) }}
-                />
-            )}
+            <EmpresaFormModal
+                show={modalForm}
+                empresa={empresaEditando}
+                onGuardar={handleGuardar}
+                onCerrar={() => { setModalForm(false); setEmpresaEditando(null) }}
+            />
 
-            {empresaBorrando && (
-                <ConfirmModal
-                    mensaje={`¿Seguro que quieres eliminar "${empresaBorrando.nombre}"? Esta acción no se puede deshacer.`}
-                    onConfirmar={handleEliminar}
-                    onCerrar={() => setEmpresaBorrando(null)}
-                    loading={loadingDelete}
-                />
-            )}
+            <ConfirmModal
+                show={!!empresaBorrando}
+                mensaje={`¿Seguro que quieres eliminar "${empresaBorrando?.nombre}"?`}
+                onConfirmar={handleEliminar}
+                onCerrar={() => setEmpresaBorrando(null)}
+                loading={loadingDelete}
+            />
 
             {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onCerrar={cerrarToast} />}
         </>

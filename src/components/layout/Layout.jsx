@@ -15,7 +15,7 @@ function Layout() {
                 onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
                 collapsed={sidebarCollapsed}
             />
-            <Sidebar isOpen={sidebarOpen} collapsed={sidebarCollapsed} />
+            <Sidebar isOpen={sidebarOpen} collapsed={sidebarCollapsed} onClose={() => setSidebarOpen(false)} />
             <main className={`layout-main ${sidebarCollapsed ? 'layout-collapsed' : ''}`}>
                 <Outlet />
             </main>

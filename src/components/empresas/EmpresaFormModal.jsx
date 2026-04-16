@@ -6,7 +6,7 @@ const FORM_INICIAL = {
     telefono: '', email: '', sector: '', logoUrl: '', idCiudad: ''
 }
 
-function EmpresaFormModal({ empresa, onGuardar, onCerrar }) {
+function EmpresaFormModal({ show, empresa, onGuardar, onCerrar }) {
     const [form, setForm] = useState(FORM_INICIAL)
     const [provincias, setProvincias] = useState([])
     const [ciudades, setCiudades] = useState([])
@@ -17,16 +17,19 @@ function EmpresaFormModal({ empresa, onGuardar, onCerrar }) {
     const bsModal = useRef(null)
 
     useEffect(() => {
-        if (modalRef.current && window.bootstrap) {
-            bsModal.current = new window.bootstrap.Modal(modalRef.current, { backdrop: 'static' })
-        }
-        return () => bsModal.current?.dispose()
+        if (!modalRef.current || !window.bootstrap) return
+        bsModal.current = new window.bootstrap.Modal(modalRef.current, { backdrop: 'static' })
+        return () => { bsModal.current?.dispose(); bsModal.current = null }
     }, [])
 
     useEffect(() => {
-        bsModal.current?.show()
-        getProvincias().then(setProvincias)
-    }, [])
+        if (!bsModal.current) return
+        show ? bsModal.current.show() : bsModal.current.hide()
+    }, [show])
+
+    useEffect(() => {
+        if (show) getProvincias().then(setProvincias)
+    }, [show])
 
     useEffect(() => {
         if (empresa) {
@@ -42,8 +45,10 @@ function EmpresaFormModal({ empresa, onGuardar, onCerrar }) {
             })
         } else {
             setForm(FORM_INICIAL)
+            setIdProvincia('')
         }
-    }, [empresa])
+        setError(null)
+    }, [empresa, show])
 
     useEffect(() => {
         if (!idProvincia) { setCiudades([]); return }
@@ -58,17 +63,11 @@ function EmpresaFormModal({ empresa, onGuardar, onCerrar }) {
         setError(null)
         try {
             await onGuardar(form)
-            bsModal.current?.hide()
-        } catch (err) {
+        } catch {
             setError('Error al guardar la empresa.')
         } finally {
             setLoading(false)
         }
-    }
-
-    const handleCerrar = () => {
-        bsModal.current?.hide()
-        onCerrar()
     }
 
     return (
@@ -76,15 +75,11 @@ function EmpresaFormModal({ empresa, onGuardar, onCerrar }) {
             <div className="modal-dialog modal-dialog-centered modal-lg">
                 <div className="modal-content">
                     <div className="modal-header">
-                        <h5 className="modal-title fw-semibold">
-                            {empresa ? 'Editar empresa' : 'Nueva empresa'}
-                        </h5>
-                        <button className="btn-close" onClick={handleCerrar} disabled={loading} />
+                        <h5 className="modal-title fw-semibold">{empresa ? 'Editar empresa' : 'Nueva empresa'}</h5>
+                        <button className="btn-close" onClick={onCerrar} disabled={loading} />
                     </div>
-
                     <div className="modal-body">
                         {error && <div className="alert alert-danger py-2 small">{error}</div>}
-
                         <form id="empresa-form" onSubmit={handleSubmit}>
                             <div className="row g-3">
                                 <div className="col-12">
@@ -119,9 +114,7 @@ function EmpresaFormModal({ empresa, onGuardar, onCerrar }) {
                                         onChange={(e) => { setIdProvincia(e.target.value); setForm({ ...form, idCiudad: '' }) }}
                                     >
                                         <option value="">Selecciona provincia</option>
-                                        {provincias.map((p) => (
-                                            <option key={p.id} value={p.id}>{p.nombre}</option>
-                                        ))}
+                                        {provincias.map((p) => <option key={p.id} value={p.id}>{p.nombre}</option>)}
                                     </select>
                                 </div>
                                 <div className="col-md-6">
@@ -134,9 +127,7 @@ function EmpresaFormModal({ empresa, onGuardar, onCerrar }) {
                                         disabled={!idProvincia}
                                     >
                                         <option value="">Selecciona ciudad</option>
-                                        {ciudades.map((c) => (
-                                            <option key={c.id} value={c.id}>{c.nombre}</option>
-                                        ))}
+                                        {ciudades.map((c) => <option key={c.id} value={c.id}>{c.nombre}</option>)}
                                     </select>
                                 </div>
                                 <div className="col-12">
@@ -146,9 +137,8 @@ function EmpresaFormModal({ empresa, onGuardar, onCerrar }) {
                             </div>
                         </form>
                     </div>
-
                     <div className="modal-footer">
-                        <button className="btn btn-light" onClick={handleCerrar} disabled={loading}>Cancelar</button>
+                        <button className="btn btn-light" onClick={onCerrar} disabled={loading}>Cancelar</button>
                         <button className="btn btn-primary" type="submit" form="empresa-form" disabled={loading}>
                             {loading
                                 ? <><span className="spinner-border spinner-border-sm me-2" />Guardando...</>

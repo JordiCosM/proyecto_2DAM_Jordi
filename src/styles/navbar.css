@@ -8,3 +8,9 @@
     align-items: center;
     gap: 8px;
 }
+
+@media (max-width: 576px) {
+    .navbar-brand-text {
+        font-size: 0.95rem;
+    }
+}
