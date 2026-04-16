@@ -39,6 +39,5 @@ public class Servicio {
     private List<Reserva> reservas = new ArrayList<>();
 
     @Column(nullable = false, columnDefinition = "INT DEFAULT 1")
-    @Builder.Default
     private Integer capacidad = 1;
 }
