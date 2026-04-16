@@ -12,4 +12,5 @@ public class ServicioDTO {
     private String descripcion;
     private Integer duracion;
     private BigDecimal precio;
+    private Integer capacidad;
 }

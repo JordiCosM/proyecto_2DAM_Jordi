@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -35,5 +36,8 @@ public class Servicio {
     private BigDecimal precio;
 
     @OneToMany(mappedBy = "servicio")
-    private List<Reserva> reservas;
+    private List<Reserva> reservas = new ArrayList<>();
+
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 1")
+    private Integer capacidad = 1;
 }

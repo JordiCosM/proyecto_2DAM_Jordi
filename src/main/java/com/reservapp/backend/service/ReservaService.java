@@ -15,6 +15,8 @@ public interface ReservaService {
     List<ReservaDTO> listarReservasPorServicio(Long idServicio);
     List<ReservaDTO> listarReservasPorFecha(LocalDate fecha);
     List<ReservaDTO> listarReservasPorServicioYFecha(Long idServicio, LocalDate fecha);
+    ReservaDTO asignarEmpleados(Long idReserva, List<Long> idEmpleados);
+    ReservaDTO desasignarEmpleado(Long idReserva, Long idEmpleado);
     ReservaDTO cambiarEstado(Long id, Reserva.Estado nuevoEstado);
     void cancelarReserva(Long id);
 }

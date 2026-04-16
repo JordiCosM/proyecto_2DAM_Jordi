@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 public class ReservaDTO {
@@ -15,4 +16,5 @@ public class ReservaDTO {
     private LocalTime horaInicio;
     private LocalTime horaFin;
     private Reserva.Estado estado;
+    private List<Long> idEmpleados;
 }

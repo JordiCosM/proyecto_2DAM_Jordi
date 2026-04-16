@@ -31,7 +31,7 @@ public class ReservaController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE', 'EMPRESA')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE', 'EMPRESA', 'BASICO', 'SUPERVISOR', 'ADMIN_EMPRESA')")
     @Operation(summary = "Obtener una reserva por id")
     public ResponseEntity<ReservaDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(reservaService.obtenerReservaPorId(id));
@@ -45,17 +45,31 @@ public class ReservaController {
     }
 
     @GetMapping("/servicio/{idServicio}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPRESA')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPRESA', 'BASICO', 'SUPERVISOR', 'ADMIN_EMPRESA')")
     @Operation(summary = "Listar reservas de un servicio")
     public ResponseEntity<List<ReservaDTO>> getByServicio(@PathVariable Long idServicio) {
         return ResponseEntity.ok(reservaService.listarReservasPorServicio(idServicio));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN', 'EMPRESA', 'BASICO', 'SUPERVISOR', 'ADMIN_EMPRESA')")
     @Operation(summary = "Crear una reserva")
     public ResponseEntity<ReservaDTO> create(@Valid @RequestBody ReservaDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(reservaService.crearReserva(dto));
+    }
+
+    @PostMapping("/{id}/empleados")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPRESA', 'ADMIN_EMPRESA', 'SUPERVISOR')")
+    @Operation(summary = "Asignar empleados a una reserva")
+    public ResponseEntity<ReservaDTO> asignarEmpleados(@PathVariable Long id, @RequestBody List<Long> idEmpleados) {
+        return ResponseEntity.ok(reservaService.asignarEmpleados(id, idEmpleados));
+    }
+
+    @DeleteMapping("/{id}/empleados/{idEmpleado}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPRESA', 'ADMIN_EMPRESA', 'SUPERVISOR')")
+    @Operation(summary = "Desasignar un empleado de una reserva")
+    public ResponseEntity<ReservaDTO> desasignarEmpleado(@PathVariable Long id, @PathVariable Long idEmpleado) {
+        return ResponseEntity.ok(reservaService.desasignarEmpleado(id, idEmpleado));
     }
 
     @PutMapping("/{id}")
@@ -66,15 +80,14 @@ public class ReservaController {
     }
 
     @PatchMapping("/{id}/estado")
-    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN', 'BASICO', 'SUPERVISOR', 'ADMIN_EMPRESA')")
     @Operation(summary = "Cambiar el estado de una reserva")
-    public ResponseEntity<ReservaDTO> cambiarEstado(@PathVariable Long id,
-                                                    @RequestParam Reserva.Estado estado) {
+    public ResponseEntity<ReservaDTO> cambiarEstado(@PathVariable Long id, @RequestParam Reserva.Estado estado) {
         return ResponseEntity.ok(reservaService.cambiarEstado(id, estado));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN', 'EMPRESA', 'ADMIN_EMPRESA')")
     @Operation(summary = "Cancelar una reserva")
     public ResponseEntity<Void> cancelar(@PathVariable Long id) {
         reservaService.cancelarReserva(id);
