@@ -10,7 +10,9 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^1.6.0
-  shared_preferences: ^2.5.4
+  shared_preferences: ^2.3.0
+  flutter_localizations:
+    sdk: flutter
 
 dev_dependencies:
   flutter_test:
