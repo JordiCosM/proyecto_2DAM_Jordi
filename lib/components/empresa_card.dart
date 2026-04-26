@@ -27,16 +27,13 @@ class EmpresaCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Logo
-              _Logo(logoUrl: empresa.logoUrl, nombre: empresa.nombre),
+              _Logo(logoUrl: empresa.logoUrlAbsoluta, nombre: empresa.nombre),
               const SizedBox(width: 14),
 
-              // Info
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Nombre
                     Text(
                       empresa.nombre,
                       style: theme.textTheme.titleSmall?.copyWith(
@@ -47,7 +44,6 @@ class EmpresaCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
 
-                    // Sector
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
@@ -68,7 +64,6 @@ class EmpresaCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
 
-                    // Descripción
                     Text(
                       empresa.descripcion,
                       style: const TextStyle(
@@ -81,7 +76,6 @@ class EmpresaCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
 
-                    // Ciudad y dirección
                     Row(
                       children: [
                         const Icon(
@@ -105,6 +99,51 @@ class EmpresaCard extends StatelessWidget {
                         ),
                       ],
                     ),
+
+                    if (empresa.imagenes.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          ...empresa.imagenesAbsolutas
+                              .take(3)
+                              .map(
+                                (url) => Padding(
+                                  padding: const EdgeInsets.only(right: 4),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(6),
+                                    child: Image.network(
+                                      url,
+                                      width: 36,
+                                      height: 36,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) =>
+                                          const SizedBox(width: 36, height: 36),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          if (empresa.imagenes.length > 3)
+                            Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  '+${empresa.imagenes.length - 3}',
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -129,7 +168,7 @@ class _Logo extends StatelessWidget {
     const size = 72.0;
     const radius = BorderRadius.all(Radius.circular(10));
 
-    if (logoUrl != null && logoUrl!.isNotEmpty) {
+    if (logoUrl != null) {
       return ClipRRect(
         borderRadius: radius,
         child: Image.network(
@@ -145,18 +184,16 @@ class _Logo extends StatelessWidget {
   }
 
   Widget _placeholder(BuildContext context, double size) {
-    final color = Theme.of(context).colorScheme.primaryContainer;
-    final letter = nombre.isNotEmpty ? nombre[0].toUpperCase() : '?';
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: color,
+        color: Theme.of(context).colorScheme.primaryContainer,
         borderRadius: const BorderRadius.all(Radius.circular(10)),
       ),
       child: Center(
         child: Text(
-          letter,
+          nombre.isNotEmpty ? nombre[0].toUpperCase() : '?',
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,

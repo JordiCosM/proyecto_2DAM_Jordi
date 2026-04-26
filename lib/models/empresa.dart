@@ -1,3 +1,5 @@
+import 'package:reservapp_mobile/config/app_config.dart';
+
 class Empresa {
   final int id;
   final int idUsuario;
@@ -9,6 +11,7 @@ class Empresa {
   final String email;
   final String sector;
   final String? logoUrl;
+  final List<String> imagenes;
 
   const Empresa({
     required this.id,
@@ -21,6 +24,7 @@ class Empresa {
     required this.email,
     required this.sector,
     this.logoUrl,
+    this.imagenes = const [],
   });
 
   factory Empresa.fromJson(Map<String, dynamic> json) => Empresa(
@@ -34,5 +38,15 @@ class Empresa {
     email: json['email'] ?? '',
     sector: json['sector'] ?? '',
     logoUrl: json['logoUrl'],
+    imagenes: (json['imagenes'] as List<dynamic>? ?? [])
+        .map((e) => e.toString())
+        .toList(),
   );
+
+  String? get logoUrlAbsoluta => (logoUrl != null && logoUrl!.isNotEmpty)
+      ? '${AppConfig.imgBaseUrl}$logoUrl'
+      : null;
+
+  List<String> get imagenesAbsolutas =>
+      imagenes.map((e) => '${AppConfig.imgBaseUrl}$e').toList();
 }

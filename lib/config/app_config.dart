@@ -6,4 +6,6 @@ class AppConfig {
   // - Pc: http://<IP_local>:8080/api
   static const String baseUrl = 'http://10.0.2.2:8080/api';
   static const String authUrl = '$baseUrl/auth';
+
+  static const String imgBaseUrl = 'http://10.0.2.2:8080';
 }

@@ -24,7 +24,7 @@ class Servicio {
     descripcion: json['descripcion'] ?? '',
     duracion: json['duracion'] ?? 0,
     precio: (json['precio'] ?? 0).toDouble(),
-    capacidad: json['capacidad'] ?? 0,
+    capacidad: ((json['capacidad'] as int?) ?? 1).clamp(1, 999999),
   );
 
   String get formattedPrecio => '${precio.toStringAsFixed(2)} €';

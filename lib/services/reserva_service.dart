@@ -48,4 +48,18 @@ class ReservaService {
       return false;
     }
   }
+
+  Future<List<Reserva>> getReservasByServicio(int idServicio) async {
+    try {
+      final response = await ApiClient.get('/reservas/servicio/$idServicio');
+      if (response.statusCode == 200) {
+        return (jsonDecode(response.body) as List)
+            .map((j) => Reserva.fromJson(j))
+            .toList();
+      }
+      return [];
+    } catch (_) {
+      return [];
+    }
+  }
 }
