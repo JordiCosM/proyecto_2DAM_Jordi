@@ -15,5 +15,7 @@ public interface EmpresaMapper {
     @Mapping(target = "ciudad", ignore = true)
     @Mapping(target = "servicios", ignore = true)
     @Mapping(target = "horarios", ignore = true)
+    @Mapping(target = "empleados", ignore = true)
+    @Mapping(target = "imagenes", ignore = true)
     Empresa toEntity(EmpresaDTO dto);
 }

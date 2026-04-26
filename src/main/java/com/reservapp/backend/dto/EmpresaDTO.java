@@ -2,6 +2,9 @@ package com.reservapp.backend.dto;
 
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 public class EmpresaDTO {
     private Long id;
@@ -14,4 +17,5 @@ public class EmpresaDTO {
     private String email;
     private String sector;
     private String logoUrl;
+    private List<String> imagenes = new ArrayList<>();
 }

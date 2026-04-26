@@ -47,6 +47,11 @@ public class Empresa {
     @Column(length = 255)
     private String logoUrl;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "empresa_imagenes", joinColumns = @JoinColumn(name = "id_empresa"))
+    @Column(name = "url", length = 255)
+    private List<String> imagenes = new ArrayList<>();
+
     @OneToMany(mappedBy = "empresa", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Servicio> servicios = new ArrayList<>();
 

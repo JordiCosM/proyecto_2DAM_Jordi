@@ -3,13 +3,8 @@ package com.reservapp.backend.service.impl;
 import com.reservapp.backend.dto.EmpresaDTO;
 import com.reservapp.backend.exception.ResourceNotFoundException;
 import com.reservapp.backend.mapper.EmpresaMapper;
-import com.reservapp.backend.model.Ciudad;
-import com.reservapp.backend.model.Empresa;
-import com.reservapp.backend.model.Reserva;
-import com.reservapp.backend.model.Usuario;
-import com.reservapp.backend.repository.CiudadRepository;
-import com.reservapp.backend.repository.EmpresaRepository;
-import com.reservapp.backend.repository.UsuarioRepository;
+import com.reservapp.backend.model.*;
+import com.reservapp.backend.repository.*;
 import com.reservapp.backend.service.EmpresaService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,7 +50,6 @@ public class EmpresaServiceImpl implements EmpresaService {
         empresa.setTelefono(dto.getTelefono());
         empresa.setEmail(dto.getEmail());
         empresa.setSector(dto.getSector());
-        empresa.setLogoUrl(dto.getLogoUrl());
 
         if (dto.getIdUsuario() != null) {
             Usuario usuario = usuarioRepository.findById(dto.getIdUsuario()).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
@@ -72,8 +66,7 @@ public class EmpresaServiceImpl implements EmpresaService {
 
     @Override
     public EmpresaDTO obtenerEmpresaPorId(Long id) {
-        Empresa empresa = empresaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Empresa no encontrada"));
-        return empresaMapper.toDTO(empresa);
+        return empresaMapper.toDTO(empresaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Empresa no encontrada")));
     }
 
     @Override
@@ -99,5 +92,29 @@ public class EmpresaServiceImpl implements EmpresaService {
         empresa.getServicios().forEach(servicio -> servicio.getReservas().stream().filter(r -> r.getEstado() == Reserva.Estado.PENDIENTE || r.getEstado() == Reserva.Estado.CONFIRMADA).forEach(r -> r.setEstado(Reserva.Estado.CANCELADA)));
 
         empresaRepository.delete(empresa);
+    }
+
+    @Override
+    @Transactional
+    public EmpresaDTO actualizarLogo(Long id, String url) {
+        Empresa empresa = empresaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Empresa no encontrada"));
+        empresa.setLogoUrl(url);
+        return empresaMapper.toDTO(empresaRepository.save(empresa));
+    }
+
+    @Override
+    @Transactional
+    public EmpresaDTO agregarImagen(Long id, String url) {
+        Empresa empresa = empresaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Empresa no encontrada"));
+        empresa.getImagenes().add(url);
+        return empresaMapper.toDTO(empresaRepository.save(empresa));
+    }
+
+    @Override
+    @Transactional
+    public EmpresaDTO eliminarImagen(Long id, String url) {
+        Empresa empresa = empresaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Empresa no encontrada"));
+        empresa.getImagenes().remove(url);
+        return empresaMapper.toDTO(empresaRepository.save(empresa));
     }
 }

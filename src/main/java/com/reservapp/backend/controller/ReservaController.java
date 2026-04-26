@@ -45,7 +45,7 @@ public class ReservaController {
     }
 
     @GetMapping("/servicio/{idServicio}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPRESA', 'BASICO', 'SUPERVISOR', 'ADMIN_EMPRESA')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE', 'EMPRESA', 'BASICO', 'SUPERVISOR', 'ADMIN_EMPRESA')")
     @Operation(summary = "Listar reservas de un servicio")
     public ResponseEntity<List<ReservaDTO>> getByServicio(@PathVariable Long idServicio) {
         return ResponseEntity.ok(reservaService.listarReservasPorServicio(idServicio));
