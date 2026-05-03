@@ -79,22 +79,56 @@ class _EmpresaDetailScreenState extends State<EmpresaDetailScreen> {
             expandedHeight: 220,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                empresa.nombre,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  shadows: [Shadow(blurRadius: 6, color: Colors.black54)],
-                ),
+              title: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: empresa.logoUrlAbsoluta != null
+                        ? Image.network(
+                            empresa.logoUrlAbsoluta!,
+                            width: 32,
+                            height: 32,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) =>
+                                _LogoMini(nombre: empresa.nombre),
+                          )
+                        : _LogoMini(nombre: empresa.nombre),
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      empresa.nombre,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: Colors.white,
+                        shadows: [Shadow(blurRadius: 6, color: Colors.black87)],
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
-              background: empresa.logoUrlAbsoluta != null
-                  ? Image.network(
-                      empresa.logoUrlAbsoluta!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
-                          _LogoPlaceholder(nombre: empresa.nombre),
-                    )
-                  : _LogoPlaceholder(nombre: empresa.nombre),
+              titlePadding: const EdgeInsets.only(left: 16, bottom: 12),
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  _AppBarBackground(empresa: empresa),
+                  const DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Colors.transparent, Colors.black54],
+                        stops: [0.4, 1.0],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
 
@@ -303,28 +337,6 @@ class _GaleriaViewerState extends State<_GaleriaViewer> {
                 size: 64,
               ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _LogoPlaceholder extends StatelessWidget {
-  final String nombre;
-  const _LogoPlaceholder({required this.nombre});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).colorScheme.primaryContainer,
-      child: Center(
-        child: Text(
-          nombre.isNotEmpty ? nombre[0].toUpperCase() : '?',
-          style: TextStyle(
-            fontSize: 64,
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
           ),
         ),
       ),
@@ -1034,6 +1046,78 @@ class _SlotsWidget extends StatelessWidget {
           ),
         );
       }).toList(),
+    );
+  }
+}
+
+class _AppBarBackground extends StatelessWidget {
+  final Empresa empresa;
+  const _AppBarBackground({required this.empresa});
+
+  @override
+  Widget build(BuildContext context) {
+    final bgUrl = empresa.imagenesAbsolutas.isNotEmpty
+        ? empresa.imagenesAbsolutas.first
+        : empresa.logoUrlAbsoluta;
+
+    if (bgUrl != null) {
+      return Image.network(
+        bgUrl,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _ColorBackground(nombre: empresa.nombre),
+      );
+    }
+    return _ColorBackground(nombre: empresa.nombre);
+  }
+}
+
+class _ColorBackground extends StatelessWidget {
+  final String nombre;
+  const _ColorBackground({required this.nombre});
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: Theme.of(context).colorScheme.primaryContainer,
+      child: Center(
+        child: Text(
+          nombre.isNotEmpty ? nombre[0].toUpperCase() : '?',
+          style: TextStyle(
+            fontSize: 72,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.25),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LogoMini extends StatelessWidget {
+  final String nombre;
+  const _LogoMini({required this.nombre});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 32,
+      height: 32,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Center(
+        child: Text(
+          nombre.isNotEmpty ? nombre[0].toUpperCase() : '?',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+      ),
     );
   }
 }

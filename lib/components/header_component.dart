@@ -89,7 +89,7 @@ class _AppHeaderState extends State<AppHeader> {
           onSelected: (value) {
             if (value == 'logout') _logout();
             if (value == 'profile') {
-              // TODO: navegar a editar perfil
+              
             }
           },
           itemBuilder: (context) => const [
