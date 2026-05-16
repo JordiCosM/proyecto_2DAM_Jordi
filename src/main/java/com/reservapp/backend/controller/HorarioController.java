@@ -22,18 +22,6 @@ public class HorarioController {
         this.horarioService = horarioService;
     }
 
-    @GetMapping
-    @Operation(summary = "Listar todos los horarios")
-    public ResponseEntity<List<HorarioDTO>> getAll() {
-        return ResponseEntity.ok(horarioService.listarHorarios());
-    }
-
-    @GetMapping("/{id}")
-    @Operation(summary = "Obtener un horario por id")
-    public ResponseEntity<HorarioDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(horarioService.obtenerHorarioPorId(id));
-    }
-
     @GetMapping("/empresa/{idEmpresa}")
     @Operation(summary = "Listar horarios de una empresa")
     public ResponseEntity<List<HorarioDTO>> getByEmpresa(@PathVariable Long idEmpresa) {

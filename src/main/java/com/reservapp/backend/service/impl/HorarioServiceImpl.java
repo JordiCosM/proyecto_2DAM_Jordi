@@ -50,18 +50,6 @@ public class HorarioServiceImpl implements HorarioService {
     }
 
     @Override
-    public HorarioDTO obtenerHorarioPorId(Long id) {
-        Horario horario = horarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Horario no encontrado"));
-        return horarioMapper.toDTO(horario);
-    }
-
-    @Override
-    public List<HorarioDTO> listarHorarios() {
-        return horarioRepository.findAll().stream().map(horarioMapper::toDTO).toList();
-    }
-
-    @Override
     public List<HorarioDTO> listarHorariosPorEmpresa(Long idEmpresa) {
         return horarioRepository.findByEmpresaId(idEmpresa).stream().map(horarioMapper::toDTO).toList();
     }

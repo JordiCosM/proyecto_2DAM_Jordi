@@ -80,11 +80,6 @@ public class EmpresaServiceImpl implements EmpresaService {
     }
 
     @Override
-    public List<EmpresaDTO> listarEmpresasPorCiudad(Long idCiudad) {
-        return empresaRepository.findByCiudadId(idCiudad).stream().map(empresaMapper::toDTO).toList();
-    }
-
-    @Override
     @Transactional
     public void eliminarEmpresa(Long id) {
         Empresa empresa = empresaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Empresa no encontrada"));

@@ -16,12 +16,6 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     List<Reserva> findByServicioId(Long servicioId);
 
-    List<Reserva> findByFecha(LocalDate fecha);
-
-    List<Reserva> findByEstado(Reserva.Estado estado);
-
-    List<Reserva> findByServicioIdAndFecha(Long servicioId, LocalDate fecha);
-
     @Query("SELECT COUNT(r) FROM Reserva r WHERE r.servicio.id = :idServicio " +
             "AND r.fecha = :fecha " +
             "AND r.estado NOT IN ('CANCELADA', 'FINALIZADA') " +

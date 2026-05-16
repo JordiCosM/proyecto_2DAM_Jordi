@@ -23,13 +23,6 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
-    @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Listar todos los usuarios")
-    public ResponseEntity<List<UsuarioDTO>> getAll() {
-        return ResponseEntity.ok(usuarioService.listarUsuarios());
-    }
-
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE', 'EMPRESA', 'BASICO', 'SUPERVISOR', 'ADMIN_EMPRESA')")
     @Operation(summary = "Obtener un usuario por id")

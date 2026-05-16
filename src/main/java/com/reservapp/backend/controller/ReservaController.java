@@ -23,20 +23,6 @@ public class ReservaController {
         this.reservaService = reservaService;
     }
 
-    @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Listar todas las reservas")
-    public ResponseEntity<List<ReservaDTO>> getAll() {
-        return ResponseEntity.ok(reservaService.listarReservas());
-    }
-
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE', 'EMPRESA', 'BASICO', 'SUPERVISOR', 'ADMIN_EMPRESA')")
-    @Operation(summary = "Obtener una reserva por id")
-    public ResponseEntity<ReservaDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(reservaService.obtenerReservaPorId(id));
-    }
-
     @GetMapping("/usuario/{idUsuario}")
     @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE')")
     @Operation(summary = "Listar reservas de un usuario")

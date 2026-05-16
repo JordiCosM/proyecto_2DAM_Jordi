@@ -73,43 +73,6 @@ class ReservaControllerTest {
         }).when(jwtAuthenticationFilter).doFilter(any(), any(), any());
     }
 
-    // GET ALL (ADMIN)
-    @Test
-    @WithMockUser(roles = "ADMIN")
-    void getAll_conRolAdmin_retornaLista() throws Exception {
-        when(reservaService.listarReservas()).thenReturn(List.of(reservaEjemplo()));
-
-        mockMvc.perform(get("/api/reservas")).andExpect(status().isOk()).andExpect(jsonPath("$[0].idUsuario").value(1)).andExpect(jsonPath("$[0].estado").value("PENDIENTE"));
-    }
-
-    @Test
-    @WithMockUser(roles = "CLIENTE")
-    void getAll_sinRolAdmin_retorna403() throws Exception {
-        mockMvc.perform(get("/api/reservas")).andExpect(status().isForbidden());
-    }
-
-    @Test
-    void getAll_sinAutenticar_retorna401() throws Exception {
-        mockMvc.perform(get("/api/reservas")).andExpect(status().isForbidden());
-    }
-
-    // GET BY ID
-    @Test
-    @WithMockUser(roles = "CLIENTE")
-    void getById_reservaExistente_retornaReserva() throws Exception {
-        when(reservaService.obtenerReservaPorId(1L)).thenReturn(reservaEjemplo());
-
-        mockMvc.perform(get("/api/reservas/1")).andExpect(status().isOk()).andExpect(jsonPath("$.id").value(1)).andExpect(jsonPath("$.idServicio").value(1)).andExpect(jsonPath("$.estado").value("PENDIENTE"));
-    }
-
-    @Test
-    @WithMockUser(roles = "CLIENTE")
-    void getById_reservaNoExistente_retorna404() throws Exception {
-        when(reservaService.obtenerReservaPorId(99L)).thenThrow(new ResourceNotFoundException("Reserva no encontrada"));
-
-        mockMvc.perform(get("/api/reservas/99")).andExpect(status().isNotFound()).andExpect(jsonPath("$.message").value("Reserva no encontrada")).andExpect(jsonPath("$.status").value(404));
-    }
-
     // GET BY USUARIO
     @Test
     @WithMockUser(roles = "CLIENTE")

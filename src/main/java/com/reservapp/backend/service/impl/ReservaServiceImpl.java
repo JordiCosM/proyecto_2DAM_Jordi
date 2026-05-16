@@ -102,17 +102,6 @@ public class ReservaServiceImpl implements ReservaService {
     }
 
     @Override
-    public ReservaDTO obtenerReservaPorId(Long id) {
-        Reserva reserva = reservaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada"));
-        return reservaMapper.toDTO(reserva);
-    }
-
-    @Override
-    public List<ReservaDTO> listarReservas() {
-        return reservaRepository.findAll().stream().map(reservaMapper::toDTO).toList();
-    }
-
-    @Override
     public List<ReservaDTO> listarReservasPorUsuario(Long idUsuario) {
         return reservaRepository.findByUsuarioId(idUsuario).stream().map(reservaMapper::toDTO).toList();
     }
@@ -120,16 +109,6 @@ public class ReservaServiceImpl implements ReservaService {
     @Override
     public List<ReservaDTO> listarReservasPorServicio(Long idServicio) {
         return reservaRepository.findByServicioId(idServicio).stream().map(reservaMapper::toDTO).toList();
-    }
-
-    @Override
-    public List<ReservaDTO> listarReservasPorFecha(LocalDate fecha) {
-        return reservaRepository.findByFecha(fecha).stream().map(reservaMapper::toDTO).toList();
-    }
-
-    @Override
-    public List<ReservaDTO> listarReservasPorServicioYFecha(Long idServicio, LocalDate fecha) {
-        return reservaRepository.findByServicioIdAndFecha(idServicio, fecha).stream().map(reservaMapper::toDTO).toList();
     }
 
     @Override

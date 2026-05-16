@@ -37,19 +37,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     @Transactional
-    public UsuarioDTO crearUsuario(RegisterRequest request) {
-        Usuario usuario = new Usuario();
-        usuario.setNombre(request.getNombre());
-        usuario.setApellidos(request.getApellidos());
-        usuario.setEmail(request.getEmail());
-        usuario.setTelefono(request.getTelefono());
-        usuario.setPassword(passwordEncoder.encode(request.getPassword()));
-        usuario.setRol(request.getRol() != null ? request.getRol() : Usuario.Rol.CLIENTE);
-        return usuarioMapper.toDTO(usuarioRepository.save(usuario));
-    }
-
-    @Override
-    @Transactional
     public UsuarioDTO crearCliente(CrearClienteRequest request) {
         if (usuarioRepository.existsByEmail(request.getEmail())) {
             throw new BadRequestException("El email ya está registrado");
@@ -90,11 +77,6 @@ public class UsuarioServiceImpl implements UsuarioService {
     public UsuarioDTO obtenerUsuarioPorId(Long id) {
         Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
         return usuarioMapper.toDTO(usuario);
-    }
-
-    @Override
-    public List<UsuarioDTO> listarUsuarios() {
-        return usuarioRepository.findAll().stream().map(usuarioMapper::toDTO).toList();
     }
 
     @Override

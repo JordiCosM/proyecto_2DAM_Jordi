@@ -28,37 +28,9 @@ public class CiudadController {
         return ResponseEntity.ok(ciudadService.listarCiudades());
     }
 
-    @GetMapping("/{id}")
-    @Operation(summary = "Obtener una ciudad por id")
-    public ResponseEntity<CiudadDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(ciudadService.obtenerCiudadPorId(id));
-    }
-
     @GetMapping("/provincia/{idProvincia}")
     @Operation(summary = "Listar ciudades de una provincia")
     public ResponseEntity<List<CiudadDTO>> getByProvincia(@PathVariable Long idProvincia) {
         return ResponseEntity.ok(ciudadService.listarCiudadesPorProvincia(idProvincia));
-    }
-
-    @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Crear una ciudad")
-    public ResponseEntity<CiudadDTO> create(@Valid @RequestBody CiudadDTO dto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ciudadService.crearCiudad(dto));
-    }
-
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Actualizar una ciudad")
-    public ResponseEntity<CiudadDTO> update(@PathVariable Long id, @Valid @RequestBody CiudadDTO dto) {
-        return ResponseEntity.ok(ciudadService.actualizarCiudad(id, dto));
-    }
-
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Eliminar una ciudad")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        ciudadService.eliminarCiudad(id);
-        return ResponseEntity.noContent().build();
     }
 }
