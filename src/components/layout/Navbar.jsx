@@ -23,12 +23,13 @@ function Navbar({ onToggleSidebar, onToggleCollapse, collapsed }) {
                 <button className="btn btn-outline-secondary btn-sm d-none d-md-inline-flex align-items-center" onClick={onToggleCollapse}>
                     <i className={`bi ${collapsed ? 'bi-layout-sidebar' : 'bi-layout-sidebar-inset'}`} />
                 </button>
-                <span className="navbar-brand mb-0 navbar-brand-text ms-1">
-                    <i className="bi bi-calendar-check me-2 text-primary" />
-                    ReservApp
-                </span>
+                <img
+                    src="/logo.png"
+                    alt="ReservApp"
+                    style={{ height: 32, objectFit: 'contain' }}
+                    className="ms-1"
+                />
             </div>
-
             <div className="dropdown">
                 <button
                     className="btn btn-outline-secondary btn-sm dropdown-toggle navbar-user-btn"

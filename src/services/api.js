@@ -1,5 +1,5 @@
-const BASE_URL = 'http://localhost:8080/api'
-export const IMG_BASE_URL = 'http://localhost:8080'
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+export const IMG_BASE_URL = import.meta.env.VITE_IMG_BASE_URL || 'http://localhost:8080'
 
 function getToken() {
     return localStorage.getItem('token')
