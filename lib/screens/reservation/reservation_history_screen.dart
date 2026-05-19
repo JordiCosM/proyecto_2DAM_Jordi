@@ -95,17 +95,6 @@ class _ReservationHistoryScreenState extends State<ReservationHistoryScreen>
         );
       }).toList();
 
-      for (final d in _todas) {
-        debugPrint(
-          '  id:${d.reserva.id} '
-          'fecha:"${d.reserva.fecha}" '
-          'horaInicio:"${d.reserva.horaInicio}" '
-          'dateTime:${d.reserva.dateTime} '
-          'estado:${d.reserva.estado} '
-          'isAfterNow:${d.reserva.dateTime.isAfter(DateTime.now())}',
-        );
-      }
-
       _todas.sort((a, b) => a.reserva.dateTime.compareTo(b.reserva.dateTime));
 
       setState(() => _isLoading = false);

@@ -40,15 +40,6 @@ class ReservaService {
     }
   }
 
-  Future<bool> eliminarReserva(int id) async {
-    try {
-      final response = await ApiClient.delete('/reservas/$id');
-      return response.statusCode == 200 || response.statusCode == 204;
-    } catch (_) {
-      return false;
-    }
-  }
-
   Future<List<Reserva>> getReservasByServicio(int idServicio) async {
     try {
       final response = await ApiClient.get('/reservas/servicio/$idServicio');

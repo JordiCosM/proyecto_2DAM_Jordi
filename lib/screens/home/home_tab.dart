@@ -203,12 +203,10 @@ class _HomeTabState extends State<HomeTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'ReservApp',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                  Image.asset(
+                    'assets/images/logo.png',
+                    height: 36,
+                    fit: BoxFit.contain,
                   ),
                   const SizedBox(height: 4),
                   Text(

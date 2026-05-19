@@ -17,18 +17,6 @@ class ServicioService {
     }
   }
 
-  Future<Servicio?> getServicioById(int id) async {
-    try {
-      final response = await ApiClient.get('/servicios/$id');
-      if (response.statusCode == 200) {
-        return Servicio.fromJson(jsonDecode(response.body));
-      }
-      return null;
-    } catch (_) {
-      return null;
-    }
-  }
-
   Future<List<Servicio>> getServiciosByEmpresa(int idEmpresa) async {
     try {
       final response = await ApiClient.get('/servicios/empresa/$idEmpresa');

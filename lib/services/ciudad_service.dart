@@ -30,16 +30,4 @@ class CiudadService {
       return [];
     }
   }
-
-  Future<Ciudad?> getCiudadById(int id) async {
-    try {
-      final response = await ApiClient.get('/ciudades/$id');
-      if (response.statusCode == 200) {
-        return Ciudad.fromJson(jsonDecode(response.body));
-      }
-      return null;
-    } catch (_) {
-      return null;
-    }
-  }
 }
