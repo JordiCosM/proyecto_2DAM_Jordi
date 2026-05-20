@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import useAuth from '../hooks/useAuth'
 import { getEmpresasByUsuario, createEmpresa, updateEmpresa, deleteEmpresa } from '../services/empresaService'
+import { IMG_BASE_URL } from '../services/api'
 import useFetch from '../hooks/useFetch'
 import useToast from '../hooks/useToast'
 import EmpresaFormModal from '../components/empresas/EmpresaFormModal'
@@ -49,16 +50,22 @@ function Empresas() {
         }
     }
 
+    const handleCerrarModal = () => {
+        setModalForm(false)
+        setEmpresaEditando(null)
+        refetch()
+    }
+
     const abrirEditar = (empresa) => { setEmpresaEditando(empresa); setModalForm(true) }
     const abrirNueva = () => { setEmpresaEditando(null); setModalForm(true) }
 
-    if (loading) {
-        return (
-            <div className="spinner-fullpage">
-                <div className="spinner-border text-primary" />
-            </div>
-        )
-    }
+    const imgUrl = (ruta) => ruta ? `${IMG_BASE_URL}${ruta}` : null
+
+    if (loading) return (
+        <div className="spinner-fullpage">
+            <div className="spinner-border text-primary" />
+        </div>
+    )
 
     if (error) return <div className="alert alert-danger">{error}</div>
 
@@ -87,7 +94,7 @@ function Empresas() {
                                 <div className="card-body">
                                     <div className="d-flex align-items-start gap-3 mb-3">
                                         {empresa.logoUrl
-                                            ? <img src={empresa.logoUrl} alt={empresa.nombre} className="empresa-logo" />
+                                            ? <img src={imgUrl(empresa.logoUrl)} alt={empresa.nombre} className="empresa-logo" />
                                             : <div className="empresa-logo-placeholder"><i className="bi bi-building" /></div>
                                         }
                                         <div className="flex-grow-1">
@@ -97,7 +104,9 @@ function Empresas() {
                                     </div>
 
                                     {empresa.descripcion && (
-                                        <p className="text-muted small mb-3" style={{ lineHeight: 1.5 }}>{empresa.descripcion}</p>
+                                        <p className="text-muted small mb-3" style={{ lineHeight: 1.5 }}>
+                                            {empresa.descripcion}
+                                        </p>
                                     )}
 
                                     <div className="d-flex flex-column gap-1 mb-3">
@@ -105,6 +114,23 @@ function Empresas() {
                                         {empresa.telefono && <span className="small text-muted"><i className="bi bi-telephone me-1" />{empresa.telefono}</span>}
                                         {empresa.email && <span className="small text-muted"><i className="bi bi-envelope me-1" />{empresa.email}</span>}
                                     </div>
+
+                                    {/* Galería */}
+                                    {empresa.imagenes?.length > 0 && (
+                                        <div className="d-flex gap-1 mb-3 flex-wrap">
+                                            {empresa.imagenes.slice(0, 4).map((url) => (
+                                                <img key={url} src={imgUrl(url)} alt=""
+                                                    className="rounded"
+                                                    style={{ width: 48, height: 48, objectFit: 'cover' }} />
+                                            ))}
+                                            {empresa.imagenes.length > 4 && (
+                                                <div className="rounded bg-light border d-flex align-items-center justify-content-center"
+                                                    style={{ width: 48, height: 48 }}>
+                                                    <span className="small text-muted">+{empresa.imagenes.length - 4}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
 
                                     <div className="d-flex gap-2">
                                         <button className="btn btn-outline-primary btn-sm flex-grow-1" onClick={() => abrirEditar(empresa)}>
@@ -125,7 +151,7 @@ function Empresas() {
                 show={modalForm}
                 empresa={empresaEditando}
                 onGuardar={handleGuardar}
-                onCerrar={() => { setModalForm(false); setEmpresaEditando(null) }}
+                onCerrar={handleCerrarModal}
             />
 
             <ConfirmModal

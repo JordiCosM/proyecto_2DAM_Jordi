@@ -1,15 +1,17 @@
 import '../../styles/home.css'
+import { IMG_BASE_URL } from '../../services/api'
 
 function EmpresaReservas({ empresa, servicios, reservasPorServicio }) {
     const reservasDelDia = (idServicio) => reservasPorServicio[idServicio] || []
     const hayReservas = servicios.some((s) => reservasDelDia(s.id).length > 0)
+    const imgUrl = (ruta) => ruta ? `${IMG_BASE_URL}${ruta}` : null
 
     return (
         <div className="card reservas-card mb-4">
             <div className="card-header d-flex align-items-center justify-content-between">
                 <div className="d-flex align-items-center gap-2">
                     {empresa.logoUrl
-                        ? <img src={empresa.logoUrl} alt={empresa.nombre} style={{ width: 36, height: 36, borderRadius: 8, objectFit: 'cover' }} />
+                        ? <img src={imgUrl(empresa.logoUrl)} alt={empresa.nombre} style={{ width: 36, height: 36, borderRadius: 8, objectFit: 'cover' }} />
                         : <div className="d-flex align-items-center justify-content-center bg-primary bg-opacity-10 rounded"
                             style={{ width: 36, height: 36 }}>
                             <i className="bi bi-building text-primary" />

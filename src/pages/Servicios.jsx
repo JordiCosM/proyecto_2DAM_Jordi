@@ -27,7 +27,6 @@ function Servicios() {
     const [servicioEditando, setServicioEditando] = useState(null)
     const [servicioBorrando, setServicioBorrando] = useState(null)
     const [loadingDelete, setLoadingDelete] = useState(false)
-    console.log(servicios);
     
     const canEdit = puedeEditar(usuario)
 

@@ -12,7 +12,6 @@ function CalendarioDisponibilidad({ getEstadoDia, fechaSeleccionada, onSelectFec
     const dias = useMemo(() => {
         const primero = new Date(mes.anio, mes.mes, 1)
         const ultimo = new Date(mes.anio, mes.mes + 1, 0)
-        // lunes=0 ... domingo=6
         const inicioSem = (primero.getDay() + 6) % 7
         const celdas = []
         for (let i = 0; i < inicioSem; i++) celdas.push(null)
