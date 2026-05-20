@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:reservapp_mobile/config/app_theme.dart';
 import 'package:reservapp_mobile/screens/home_screen.dart';
 import 'package:reservapp_mobile/services/auth_service.dart';
 
@@ -11,162 +12,213 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
-  final AuthService _authService = AuthService();
+  final _authService = AuthService();
 
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _surnameController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final _nameCtrl = TextEditingController();
+  final _surnameCtrl = TextEditingController();
+  final _phoneCtrl = TextEditingController();
+  final _emailCtrl = TextEditingController();
+  final _passwordCtrl = TextEditingController();
+  final _confirmPasswordCtrl = TextEditingController();
 
   bool _isCompany = false;
   bool _isLoading = false;
   bool _obscurePassword = true;
-  
+  bool _obscureConfirm = true;
 
-  void _register() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _surnameCtrl.dispose();
+    _phoneCtrl.dispose();
+    _emailCtrl.dispose();
+    _passwordCtrl.dispose();
+    _confirmPasswordCtrl.dispose();
+    super.dispose();
+  }
 
-      final success = await _authService.register(
-        name: _nameController.text.trim(),
-        surname: _surnameController.text.trim(),
-        phone: _phoneController.text.trim(),
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-        isCompany: _isCompany,
+  Future<void> _register() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isLoading = true);
+
+    final success = await _authService.register(
+      name: _nameCtrl.text.trim(),
+      surname: _surnameCtrl.text.trim(),
+      phone: _phoneCtrl.text.trim(),
+      email: _emailCtrl.text.trim(),
+      password: _passwordCtrl.text.trim(),
+      isCompany: _isCompany,
+    );
+
+    setState(() => _isLoading = false);
+
+    if (!mounted) return;
+
+    if (success) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        (_) => false,
       );
-
-      setState(() => _isLoading = false);
-
-      if (success) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
-          (route) => false,
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Error al registrarse")),
-        );
-      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error al registrarse. Inténtalo de nuevo.'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Registro")),
+      appBar: AppBar(title: const Text('Crear cuenta')),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: AppDimens.screenPadding,
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: "Nombre",
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) =>
-                    value == null || value.isEmpty ? "Campo obligatorio" : null,
-              ),
-              const SizedBox(height: 15),
+              const SizedBox(height: AppDimens.spacingSm),
 
+              // Nombre
               TextFormField(
-                controller: _surnameController,
+                controller: _nameCtrl,
                 decoration: const InputDecoration(
-                  labelText: "Apellidos",
-                  border: OutlineInputBorder(),
+                  labelText: 'Nombre',
+                  prefixIcon: Icon(Icons.person_outline),
                 ),
-                validator: (value) =>
-                    value == null || value.isEmpty ? "Campo obligatorio" : null,
+                textCapitalization: TextCapitalization.words,
+                validator: (v) =>
+                    v == null || v.isEmpty ? 'Campo obligatorio' : null,
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: AppDimens.spacingMd),
 
+              // Apellidos
               TextFormField(
-                controller: _phoneController,
+                controller: _surnameCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Apellidos',
+                  prefixIcon: Icon(Icons.badge_outlined),
+                ),
+                textCapitalization: TextCapitalization.words,
+                validator: (v) =>
+                    v == null || v.isEmpty ? 'Campo obligatorio' : null,
+              ),
+              const SizedBox(height: AppDimens.spacingMd),
+
+              // Teléfono
+              TextFormField(
+                controller: _phoneCtrl,
                 keyboardType: TextInputType.phone,
                 decoration: const InputDecoration(
-                  labelText: "Teléfono",
-                  border: OutlineInputBorder(),
+                  labelText: 'Teléfono',
+                  prefixIcon: Icon(Icons.phone_outlined),
                 ),
-                validator: (value) =>
-                    value == null || value.isEmpty ? "Campo obligatorio" : null,
+                validator: (v) =>
+                    v == null || v.isEmpty ? 'Campo obligatorio' : null,
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: AppDimens.spacingMd),
 
+              // Email
               TextFormField(
-                controller: _emailController,
+                controller: _emailCtrl,
+                keyboardType: TextInputType.emailAddress,
                 decoration: const InputDecoration(
-                  labelText: "Correo electrónico",
-                  border: OutlineInputBorder(),
+                  labelText: 'Correo electrónico',
+                  prefixIcon: Icon(Icons.email_outlined),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Campo obligatorio";
-                  }
-                  if (!value.contains('@')) {
-                    return "Correo inválido";
-                  }
+                validator: (v) {
+                  if (v == null || v.isEmpty) return 'Campo obligatorio';
+                  if (!v.contains('@')) return 'Correo inválido';
                   return null;
                 },
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: AppDimens.spacingMd),
 
+              // Contraseña
               TextFormField(
-                controller: _passwordController,
+                controller: _passwordCtrl,
                 obscureText: _obscurePassword,
-                decoration: const InputDecoration(
-                  labelText: "Contraseña",
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: 'Contraseña',
+                  prefixIcon: const Icon(Icons.lock_outline),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                    ),
+                    onPressed: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
+                  ),
                 ),
-                validator: (value) {
-                  if (value == null || value.length < 6) {
-                    return "Mínimo 6 caracteres";
-                  }
+                validator: (v) {
+                  if (v == null || v.isEmpty) return 'Campo obligatorio';
+                  if (v.length < 8) return 'Mínimo 8 caracteres';
                   return null;
                 },
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: AppDimens.spacingMd),
 
+              // Confirmar contraseña
               TextFormField(
-                controller: _confirmPasswordController,
-                obscureText: _obscurePassword,
-                decoration: const InputDecoration(
-                  labelText: "Confirmar contraseña",
-                  border: OutlineInputBorder(),
+                controller: _confirmPasswordCtrl,
+                obscureText: _obscureConfirm,
+                decoration: InputDecoration(
+                  labelText: 'Confirmar contraseña',
+                  prefixIcon: const Icon(Icons.lock_outline),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureConfirm
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                    ),
+                    onPressed: () =>
+                        setState(() => _obscureConfirm = !_obscureConfirm),
+                  ),
                 ),
-                validator: (value) {
-                  if (value != _passwordController.text) {
-                    return "Las contraseñas no coinciden";
+                validator: (v) {
+                  if (v == null || v.isEmpty) return 'Campo obligatorio';
+                  if (v != _passwordCtrl.text) {
+                    return 'Las contraseñas no coinciden';
                   }
                   return null;
                 },
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: AppDimens.spacingMd),
 
+              // Empresa
               SwitchListTile(
-                title: const Text("¿Es una empresa?"),
-                value: _isCompany,
-                onChanged: (value) {
-                  setState(() => _isCompany = value);
-                },
-              ),
-
-              const SizedBox(height: 25),
-
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _register,
-                  child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text("Registrarse"),
+                title: const Text('Registrarme como empresa'),
+                subtitle: const Text(
+                  'Activa esto solo si representas a un negocio',
+                  style: TextStyle(fontSize: 12),
                 ),
+                value: _isCompany,
+                onChanged: (v) => setState(() => _isCompany = v),
+                contentPadding: EdgeInsets.zero,
               ),
+
+              const SizedBox(height: AppDimens.spacingLg),
+
+              // Registrarse
+              ElevatedButton(
+                onPressed: _isLoading ? null : _register,
+                child: _isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text('Crear cuenta'),
+              ),
+
+              const SizedBox(height: AppDimens.spacingMd),
             ],
           ),
         ),

@@ -1,75 +1,35 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:reservapp_mobile/config/app_config.dart';
 
 class AuthService {
-  final String baseUrl = "http://10.0.2.2:8080/api/auth";
+  static const _tokenKey = 'jwt_token';
+  static const _timeout = Duration(seconds: 10);
 
   Future<bool> login(String email, String password) async {
     try {
-      final url = Uri.parse("$baseUrl/login");
-
       final response = await http
           .post(
-            url,
-            headers: {"Content-Type": "application/json"},
-            body: jsonEncode({"email": email, "password": password}),
+            Uri.parse('${AppConfig.authUrl}/login'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'email': email, 'password': password}),
           )
-          .timeout(const Duration(seconds: 10));
-
-      print("STATUS: ${response.statusCode}");
-      print("BODY: ${response.body}");
+          .timeout(_timeout);
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final token = data["token"];
-
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString("jwt_token", token);
-
-        return true;
+        final token = jsonDecode(response.body)['token'] as String?;
+        if (token != null) await _saveToken(token);
+        final id = jsonDecode(response.body)['idUsuario'];
+        if (id != null) await _saveUserId((id as num).toInt());
+        return token != null;
       }
-
       return false;
-    } catch (e) {
-      print("ERROR LOGIN: $e");
+    } catch (_) {
       return false;
     }
   }
 
-  // Future<bool> register({
-  //   required String name,
-  //   required String surname,
-  //   required String phone,
-  //   required String email,
-  //   required String password,
-  //   required bool isCompany,
-  // }) async {
-  //   try {
-  //     final url = Uri.parse("$baseUrl/register");
-
-  //     final response = await http.post(
-  //       url,
-  //       headers: {"Content-Type": "application/json"},
-  //       body: jsonEncode({
-  //         "name": name,
-  //         "surname": surname,
-  //         "phone": phone,
-  //         "email": email,
-  //         "password": password,
-  //         "role": isCompany ? "COMPANY" : "CLIENT"
-  //       }),
-  //     );
-
-  //     print("STATUS REGISTER: ${response.statusCode}");
-  //     print("BODY REGISTER: ${response.body}");
-
-  //     return response.statusCode == 201 || response.statusCode == 200;
-  //   } catch (e) {
-  //     print("ERROR REGISTER: $e");
-  //     return false;
-  //   }
-  // }
   Future<bool> register({
     required String name,
     required String surname,
@@ -79,44 +39,113 @@ class AuthService {
     required bool isCompany,
   }) async {
     try {
-      final url = Uri.parse("$baseUrl/register");
-
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "nombre": name,
-          "apellidos": surname,
-          "email": email,
-          "telefono": phone,
-          "password": password,
-          "role": isCompany ? "empresa" : "cliente",
-        }),
-      );
+      final response = await http
+          .post(
+            Uri.parse('${AppConfig.authUrl}/register'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'nombre': name,
+              'apellidos': surname,
+              'email': email,
+              'telefono': phone,
+              'password': password,
+              'rol': isCompany ? 'EMPRESA' : 'CLIENTE',
+            }),
+          )
+          .timeout(_timeout);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = jsonDecode(response.body);
-        final token = data["token"];
-
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString("jwt_token", token);
-
-        return true;
+        final token = jsonDecode(response.body)['token'] as String?;
+        if (token != null) await _saveToken(token);
+        final id = jsonDecode(response.body)['idUsuario'];
+        if (id != null) await _saveUserId((id as num).toInt());
+        return token != null;
       }
       return false;
-    } catch (e) {
-      print("ERROR REGISTER: $e");
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<bool> verifyToken() async {
+    try {
+      final token = await getToken();
+      if (token == null || token.isEmpty) return false;
+
+      final response = await http
+          .get(
+            Uri.parse('${AppConfig.authUrl}/me'),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+          )
+          .timeout(_timeout);
+
+      return response.statusCode == 200;
+    } catch (_) {
+      return true;
+    }
+  }
+
+  Future<bool> forgotPassword(String email) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse('${AppConfig.authUrl}/forgot-password'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'email': email}),
+          )
+          .timeout(_timeout);
+
+      return response.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<bool> resetPassword({
+    required String token,
+    required String newPassword,
+  }) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse('${AppConfig.authUrl}/reset-password'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'token': token, 'nuevaPassword': newPassword}),
+          )
+          .timeout(_timeout);
+
+      return response.statusCode == 200;
+    } catch (_) {
       return false;
     }
   }
 
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove("jwt_token");
+    await prefs.remove('user_id');
+    await prefs.remove(_tokenKey);
   }
 
   Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString("jwt_token");
+    return prefs.getString(_tokenKey);
+  }
+
+  Future<void> _saveToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_tokenKey, token);
+  }
+
+  Future<int?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('user_id');
+  }
+
+  Future<void> _saveUserId(int id) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('user_id', id);
   }
 }
