@@ -27,32 +27,4 @@ public class ProvinciaController {
     public ResponseEntity<List<ProvinciaDTO>> getAll() {
         return ResponseEntity.ok(provinciaService.listarProvincias());
     }
-
-    @GetMapping("/{id}")
-    @Operation(summary = "Obtener una provincia por id")
-    public ResponseEntity<ProvinciaDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(provinciaService.obtenerProvinciaPorId(id));
-    }
-
-    @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Crear una provincia")
-    public ResponseEntity<ProvinciaDTO> create(@Valid @RequestBody ProvinciaDTO dto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(provinciaService.crearProvincia(dto));
-    }
-
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Actualizar una provincia")
-    public ResponseEntity<ProvinciaDTO> update(@PathVariable Long id, @Valid @RequestBody ProvinciaDTO dto) {
-        return ResponseEntity.ok(provinciaService.actualizarProvincia(id, dto));
-    }
-
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Eliminar una provincia")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        provinciaService.eliminarProvincia(id);
-        return ResponseEntity.noContent().build();
-    }
 }

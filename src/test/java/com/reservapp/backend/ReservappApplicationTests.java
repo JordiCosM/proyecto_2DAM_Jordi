@@ -1,4 +1,4 @@
-package com.reservapp.reservapp;
+package com.reservapp.backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

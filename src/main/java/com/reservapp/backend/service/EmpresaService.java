@@ -10,6 +10,9 @@ public interface EmpresaService {
     EmpresaDTO obtenerEmpresaPorId(Long id);
     List<EmpresaDTO> listarEmpresas();
     List<EmpresaDTO> listarEmpresasPorUsuario(Long idUsuario);
-    List<EmpresaDTO> listarEmpresasPorCiudad(Long idCiudad);
     void eliminarEmpresa(Long id);
+
+    EmpresaDTO actualizarLogo(Long id, String url);
+    EmpresaDTO agregarImagen(Long id, String url);
+    EmpresaDTO eliminarImagen(Long id, String url);
 }

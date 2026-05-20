@@ -2,6 +2,7 @@ package com.reservapp.backend.controller;
 
 import com.reservapp.backend.dto.*;
 import com.reservapp.backend.exception.ResourceNotFoundException;
+import com.reservapp.backend.exception.UnauthorizedException;
 import com.reservapp.backend.model.Empleado;
 import com.reservapp.backend.model.Usuario;
 import com.reservapp.backend.repository.EmpleadoRepository;
@@ -59,20 +60,18 @@ public class AuthController {
     @GetMapping("/me")
     @Operation(summary = "Obtener datos del usuario o empleado autenticado")
     public ResponseEntity<AuthResponse> me(Authentication authentication) {
+        if (authentication == null) {
+            throw new UnauthorizedException("No autenticado");
+        }
         String email = authentication.getName();
 
         Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
         if (usuarioOpt.isPresent()) {
             Usuario usuario = usuarioOpt.get();
-            return ResponseEntity.ok(new AuthResponse(null, usuario.getId(),
-                    usuario.getNombre(), usuario.getEmail(),
-                    usuario.getRol().name(), "USUARIO", null));
+            return ResponseEntity.ok(new AuthResponse(null, usuario.getId(), usuario.getNombre(), usuario.getEmail(), usuario.getRol().name(), "USUARIO", null));
         }
 
         Empleado empleado = empleadoRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("No encontrado"));
-        return ResponseEntity.ok(new AuthResponse(null, empleado.getId(),
-                empleado.getNombre(), empleado.getEmail(),
-                empleado.getRol().name(), "EMPLEADO",
-                empleado.getEmpresa().getId()));
+        return ResponseEntity.ok(new AuthResponse(null, empleado.getId(), empleado.getNombre(), empleado.getEmail(), empleado.getRol().name(), "EMPLEADO", empleado.getEmpresa().getId()));
     }
 }

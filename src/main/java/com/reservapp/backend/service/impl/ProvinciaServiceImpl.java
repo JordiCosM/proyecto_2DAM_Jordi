@@ -22,41 +22,7 @@ public class ProvinciaServiceImpl implements ProvinciaService {
     }
 
     @Override
-    @Transactional
-    public ProvinciaDTO crearProvincia(ProvinciaDTO dto) {
-        Provincia provincia = provinciaMapper.toEntity(dto);
-        return provinciaMapper.toDTO(provinciaRepository.save(provincia));
-    }
-
-    @Override
-    @Transactional
-    public ProvinciaDTO actualizarProvincia(Long id, ProvinciaDTO dto) {
-        Provincia provincia = provinciaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Provincia no encontrada"));
-
-        provincia.setNombre(dto.getNombre());
-
-        return provinciaMapper.toDTO(provinciaRepository.save(provincia));
-    }
-
-    @Override
-    public ProvinciaDTO obtenerProvinciaPorId(Long id) {
-        Provincia provincia = provinciaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Provincia no encontrada"));
-        return provinciaMapper.toDTO(provincia);
-    }
-
-    @Override
     public List<ProvinciaDTO> listarProvincias() {
         return provinciaRepository.findAll().stream().map(provinciaMapper::toDTO).toList();
-    }
-
-    @Override
-    @Transactional
-    public void eliminarProvincia(Long id) {
-        if (!provinciaRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Provincia no encontrada");
-        }
-        provinciaRepository.deleteById(id);
     }
 }

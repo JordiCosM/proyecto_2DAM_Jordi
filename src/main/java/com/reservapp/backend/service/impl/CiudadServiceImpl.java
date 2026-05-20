@@ -22,32 +22,6 @@ public class CiudadServiceImpl implements CiudadService {
     }
 
     @Override
-    @Transactional
-    public CiudadDTO crearCiudad(CiudadDTO dto) {
-        Ciudad ciudad = ciudadMapper.toEntity(dto);
-        return ciudadMapper.toDTO(ciudadRepository.save(ciudad));
-    }
-
-    @Override
-    @Transactional
-    public CiudadDTO actualizarCiudad(Long id, CiudadDTO dto) {
-        Ciudad ciudad = ciudadRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Ciudad no encontrada"));
-
-        ciudad.setNombre(dto.getNombre());
-        ciudad.setCodPostal(dto.getCodPostal());
-
-        return ciudadMapper.toDTO(ciudadRepository.save(ciudad));
-    }
-
-    @Override
-    public CiudadDTO obtenerCiudadPorId(Long id) {
-        Ciudad ciudad = ciudadRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Ciudad no encontrada"));
-        return ciudadMapper.toDTO(ciudad);
-    }
-
-    @Override
     public List<CiudadDTO> listarCiudades() {
         return ciudadRepository.findAll().stream().map(ciudadMapper::toDTO).toList();
     }
@@ -55,14 +29,5 @@ public class CiudadServiceImpl implements CiudadService {
     @Override
     public List<CiudadDTO> listarCiudadesPorProvincia(Long idProvincia) {
         return ciudadRepository.findByProvinciaId(idProvincia).stream().map(ciudadMapper::toDTO).toList();
-    }
-
-    @Override
-    @Transactional
-    public void eliminarCiudad(Long id) {
-        if (!ciudadRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Ciudad no encontrada");
-        }
-        ciudadRepository.deleteById(id);
     }
 }

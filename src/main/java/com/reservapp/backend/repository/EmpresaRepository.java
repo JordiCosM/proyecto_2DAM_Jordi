@@ -9,5 +9,4 @@ import java.util.List;
 @Repository
 public interface EmpresaRepository extends JpaRepository<Empresa, Long> {
     List<Empresa> findByUsuarioId(Long usuarioId);
-    List<Empresa> findByCiudadId(Long ciudadId);
 }
