@@ -22,13 +22,13 @@ public class Horario {
     private Empresa empresa;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10)
+    @Column(name = "dia", nullable = false, length = 10)
     private Dia dia;
 
-    @Column(nullable = false)
+    @Column(name = "apertura", nullable = false)
     private LocalTime apertura;
 
-    @Column(nullable = false)
+    @Column(name = "cierre", nullable = false)
     private LocalTime cierre;
 
     public enum Dia {

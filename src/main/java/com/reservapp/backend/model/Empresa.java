@@ -26,25 +26,25 @@ public class Empresa {
     @JoinColumn(name = "id_ciudad", nullable = false)
     private Ciudad ciudad;
 
-    @Column(nullable = false, length = 150)
+    @Column(name = "nombre", nullable = false, length = 150)
     private String nombre;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "descripcion", columnDefinition = "TEXT")
     private String descripcion;
 
-    @Column(length = 255)
+    @Column(name = "direccion", length = 255)
     private String direccion;
 
-    @Column(length = 20)
+    @Column(name = "telefono", length = 20)
     private String telefono;
 
-    @Column(length = 150)
+    @Column(name = "email", length = 150)
     private String email;
 
-    @Column(length = 100)
+    @Column(name = "sector", length = 100)
     private String sector;
 
-    @Column(length = 255)
+    @Column(name = "logoUrl", length = 255)
     private String logoUrl;
 
     @ElementCollection(fetch = FetchType.EAGER)

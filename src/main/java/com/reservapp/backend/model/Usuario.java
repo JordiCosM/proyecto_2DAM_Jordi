@@ -18,23 +18,23 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
+    @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
 
-    @Column(length = 150)
+    @Column(name = "apellidos", length = 150)
     private String apellidos;
 
-    @Column(nullable = false, length = 150, unique = true)
+    @Column(name = "email", nullable = false, length = 150, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(length = 20)
+    @Column(name = "telefono", length = 20)
     private String telefono;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(name = "rol", nullable = false, length = 20)
     @Builder.Default
     private Rol rol = Rol.CLIENTE;
 

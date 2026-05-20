@@ -22,10 +22,10 @@ public class Ciudad {
     @JoinColumn(name = "id_provincia", nullable = false)
     private Provincia provincia;
 
-    @Column(nullable = false, length = 100)
+    @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
 
-    @Column(length = 10)
+    @Column(name = "cod_postal", length = 10)
     private String codPostal;
 
     @OneToMany(mappedBy = "ciudad")
