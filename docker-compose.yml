@@ -1,0 +1,70 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: reservapp-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DB:-reservapp}
+      MYSQL_USER: ${MYSQL_USER:-reservapp}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-reservapp}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-root}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  backend:
+    build: ./reservapp
+    container_name: reservapp-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DB: ${MYSQL_DB:-reservapp}
+      MYSQL_USER: ${MYSQL_USER:-reservapp}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-reservapp}
+      JWT_SECRET: ${JWT_SECRET:-cambia_esto_en_produccion_min32chars!!}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - uploads:/app/uploads
+
+  frontend-web:
+    build:
+      context: ./reservapp_web
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8080/api}
+        VITE_IMG_BASE_URL: ${VITE_IMG_BASE_URL:-http://localhost:8080}
+    container_name: reservapp-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+  frontend-mobile-web:
+    build:
+      context: ./reservapp_mobile
+      args:
+        API_URL: ${VITE_API_URL:-http://localhost:8080/api}
+        IMG_BASE_URL: ${VITE_IMG_BASE_URL:-http://localhost:8080}
+    container_name: reservapp-mobile-web
+    restart: unless-stopped
+    ports:
+      - "4000:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
+  uploads:
