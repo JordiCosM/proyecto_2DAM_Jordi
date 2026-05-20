@@ -1,0 +1,63 @@
+package com.reservapp.backend.model;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "empresas")
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Empresa {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario", nullable = false)
+    private Usuario usuario;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_ciudad", nullable = false)
+    private Ciudad ciudad;
+
+    @Column(name = "nombre", nullable = false, length = 150)
+    private String nombre;
+
+    @Column(name = "descripcion", columnDefinition = "TEXT")
+    private String descripcion;
+
+    @Column(name = "direccion", length = 255)
+    private String direccion;
+
+    @Column(name = "telefono", length = 20)
+    private String telefono;
+
+    @Column(name = "email", length = 150)
+    private String email;
+
+    @Column(name = "sector", length = 100)
+    private String sector;
+
+    @Column(name = "logoUrl", length = 255)
+    private String logoUrl;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "empresa_imagenes", joinColumns = @JoinColumn(name = "id_empresa"))
+    @Column(name = "url", length = 255)
+    private List<String> imagenes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "empresa", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Servicio> servicios = new ArrayList<>();
+
+    @OneToMany(mappedBy = "empresa", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Horario> horarios = new ArrayList<>();
+
+    @OneToMany(mappedBy = "empresa", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Empleado> empleados = new ArrayList<>();
+}
