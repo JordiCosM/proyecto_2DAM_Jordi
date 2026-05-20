@@ -28,17 +28,17 @@ public class Reserva {
     @JoinColumn(name = "id_servicio", nullable = false)
     private Servicio servicio;
 
-    @Column(nullable = false)
+    @Column(name = "fecha", nullable = false)
     private LocalDate fecha;
 
-    @Column(nullable = false)
+    @Column(name = "hora_inicio", nullable = false)
     private LocalTime horaInicio;
 
-    @Column(nullable = false)
+    @Column(name = "hora_fin", nullable = false)
     private LocalTime horaFin;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(name = "estado", nullable = false, length = 20)
     @Builder.Default
     private Estado estado = Estado.PENDIENTE;
 

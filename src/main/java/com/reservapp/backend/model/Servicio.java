@@ -23,21 +23,21 @@ public class Servicio {
     @JoinColumn(name = "id_empresa", nullable = false)
     private Empresa empresa;
 
-    @Column(nullable = false, length = 150)
+    @Column(name = "nombre", nullable = false, length = 150)
     private String nombre;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "descripcion", columnDefinition = "TEXT")
     private String descripcion;
 
-    @Column(nullable = false)
+    @Column(name = "duracion", nullable = false)
     private Integer duracion; // minutos
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(name = "precio", nullable = false, precision = 10, scale = 2)
     private BigDecimal precio;
 
     @OneToMany(mappedBy = "servicio")
     private List<Reserva> reservas = new ArrayList<>();
 
-    @Column(nullable = false, columnDefinition = "INT DEFAULT 1")
+    @Column(name = "capacidad", nullable = false, columnDefinition = "INT DEFAULT 1")
     private Integer capacidad = 1;
 }
