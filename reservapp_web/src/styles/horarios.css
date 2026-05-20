@@ -1,0 +1,49 @@
+.horario-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+}
+
+.dia-badge {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: #e7f1ff;
+    color: #0a58ca;
+    min-width: 110px;
+    text-align: center;
+}
+
+.horario-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.875rem;
+}
+
+.horario-row:last-child {
+    border-bottom: none;
+}
+
+.horario-horas {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #495057;
+}
+
+.horario-separador {
+    color: #adb5bd;
+    font-size: 0.75rem;
+}
+
+@media (max-width: 576px) {
+    .horario-row {
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 12px 0;
+    }
+}

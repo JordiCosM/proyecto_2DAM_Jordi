@@ -1,0 +1,26 @@
+.layout-main {
+    margin-top: 56px;
+    margin-left: 240px;
+    padding: 1.5rem;
+    min-height: calc(100vh - 56px);
+    background: #f4f6f9;
+    transition: margin-left 0.3s ease;
+}
+
+.layout-main.layout-collapsed {
+    margin-left: 56px;
+}
+
+@media (max-width: 768px) {
+
+    .layout-main,
+    .layout-main.layout-collapsed {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .layout-main {
+        padding: 1rem 0.75rem;
+    }
+}

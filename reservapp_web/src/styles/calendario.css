@@ -1,0 +1,219 @@
+.cal-wrapper {
+    user-select: none;
+}
+
+.cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.cal-titulo {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #212529;
+    text-transform: capitalize;
+}
+
+.cal-nav {
+    background: none;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: #495057;
+    transition: background 0.15s;
+}
+
+.cal-nav:hover {
+    background: #f8f9fa;
+}
+
+.cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.cal-dia-nombre {
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #adb5bd;
+    padding: 4px 0;
+    text-transform: uppercase;
+}
+
+.cal-dia {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 500;
+    position: relative;
+    transition: all 0.15s;
+    border: 1.5px solid transparent;
+}
+
+.cal-dia.vacio {
+    cursor: default;
+}
+
+.cal-dia.pasado {
+    color: #ced4da;
+    cursor: not-allowed;
+}
+
+.cal-dia.cerrado {
+    color: #adb5bd;
+    background: #f8f9fa;
+    cursor: not-allowed;
+}
+
+.cal-dia.disponible {
+    color: #212529;
+    background: #f0fdf4;
+    border-color: #86efac;
+}
+
+.cal-dia.disponible:hover {
+    background: #dcfce7;
+    border-color: #4ade80;
+}
+
+.cal-dia.lleno {
+    color: #6c757d;
+    background: #fff5f5;
+    border-color: #fca5a5;
+    cursor: not-allowed;
+}
+
+.cal-dia.seleccionado {
+    background: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: #fff !important;
+    font-weight: 700;
+}
+
+.cal-dia.hoy::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.cal-leyenda {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.cal-leyenda-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.72rem;
+    color: #6c757d;
+}
+
+.cal-leyenda-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+/* Slots */
+.slots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.slot-btn {
+    padding: 8px 4px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: all 0.15s;
+}
+
+.slot-btn.disponible {
+    background: #f0fdf4;
+    border-color: #86efac;
+    color: #166534;
+}
+
+.slot-btn.disponible:hover {
+    background: #dcfce7;
+    border-color: #4ade80;
+}
+
+.slot-btn.seleccionado {
+    background: #0d6efd;
+    border-color: #0d6efd;
+    color: #fff;
+    font-weight: 700;
+}
+
+.slot-btn.ocupado {
+    background: #f8f9fa;
+    border-color: #dee2e6;
+    color: #ced4da;
+    cursor: not-allowed;
+}
+
+@media (min-width: 768px) {
+    .cal-wrapper {
+        max-width: 320px;
+    }
+
+    .cal-dia {
+        font-size: 0.78rem;
+        border-radius: 6px;
+    }
+
+    .cal-grid {
+        gap: 3px;
+    }
+
+    .cal-titulo {
+        font-size: 0.875rem;
+    }
+
+    .cal-leyenda {
+        gap: 8px;
+    }
+
+    .cal-leyenda-item {
+        font-size: 0.68rem;
+    }
+
+    .slots-grid {
+        grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
+        gap: 6px;
+    }
+
+    .slot-btn {
+        font-size: 0.78rem;
+        padding: 6px 4px;
+    }
+}
